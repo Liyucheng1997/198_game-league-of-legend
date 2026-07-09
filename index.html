@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>英雄联盟 · 网页复刻版</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ================= 英雄选择 ================= -->
+<div id="select-screen">
+  <div class="sel-header">
+    <h1>英雄联盟</h1>
+    <div class="sub">网页复刻版 · 召唤师峡谷 5V5</div>
+  </div>
+  <div class="sel-main">
+    <div class="team-col blue">
+      <h3>我方（蓝色方）</h3>
+      <div id="team-blue-list"></div>
+    </div>
+    <div class="sel-center">
+      <div id="champ-grid"></div>
+      <div class="sel-detail">
+        <div id="sel-portrait"></div>
+        <div class="sel-info">
+          <h2 id="sel-name"></h2>
+          <div class="title" id="sel-title"></div>
+          <div class="passive" id="sel-passive"></div>
+          <div id="sel-skills"></div>
+        </div>
+      </div>
+    </div>
+    <div class="team-col red">
+      <h3>敌方（红色方）</h3>
+      <div id="team-red-list"></div>
+    </div>
+  </div>
+  <div class="sel-footer">
+    <button id="btn-lock">锁 定 英 雄</button>
+  </div>
+</div>
+
+<!-- ================= 游戏画面 ================= -->
+<div id="game-screen">
+  <canvas id="game-canvas"></canvas>
+
+  <div id="top-frame">
+    <span id="score-blue">0</span>
+    <span class="swords">⚔</span>
+    <span id="game-timer">0:00</span>
+    <span class="swords">⚔</span>
+    <span id="score-red">0</span>
+  </div>
+
+  <div id="killfeed"></div>
+  <div id="announce"></div>
+
+  <!-- 底部 HUD -->
+  <div id="hud">
+    <div id="hud-left">
+      <div id="hud-kdainfo">
+        <div>K/D/A <b id="hud-kda">0/0/0</b></div>
+        <div>补刀 <b id="hud-cs">0</b></div>
+        <div id="hud-gold-box">🪙 <span id="hud-gold">500</span></div>
+        <button id="btn-shop">商店 (P)</button>
+      </div>
+      <div id="hud-portrait-wrap" style="position:relative">
+        <div id="hud-portrait"></div>
+        <div id="hud-level"></div>
+      </div>
+      <div id="xp-ring"><div id="xp-fill"></div></div>
+    </div>
+    <div id="hud-center">
+      <div id="hud-skills"></div>
+      <div id="hp-bar"><div id="hp-fill"></div><div id="hp-shield"></div><div id="hp-text"></div></div>
+      <div id="mp-bar"><div id="mp-fill"></div><div id="mp-text"></div></div>
+    </div>
+    <div id="hud-right">
+      <div id="hud-items"></div>
+      <div id="hud-stats">
+        <div class="row">攻击力 <span id="stat-ad">0</span></div>
+        <div class="row">法术强度 <span id="stat-ap">0</span></div>
+        <div class="row">护甲 <span id="stat-armor">0</span></div>
+        <div class="row">魔抗 <span id="stat-mr">0</span></div>
+        <div class="row">攻速 <span id="stat-as">0</span></div>
+        <div class="row">移速 <span id="stat-ms">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="recall-bar"><div id="recall-fill"></div></div>
+
+  <div id="minimap-box"><canvas id="minimap" width="252" height="252"></canvas></div>
+
+  <!-- 商店 -->
+  <div id="shop">
+    <div id="shop-header">
+      <h3>商 店</h3>
+      <span class="sg">🪙 <span id="shop-gold">0</span></span>
+      <button id="shop-close">✕</button>
+    </div>
+    <div id="shop-tabs"></div>
+    <div id="shop-grid"></div>
+    <div id="shop-hint">左键购买 · 在装备栏右键出售(70%) · 需在泉水附近购买</div>
+  </div>
+
+  <!-- 记分板 -->
+  <div id="scoreboard">
+    <div class="sb-panel blue"><h3>我方（蓝色方）</h3><div id="sb-blue"></div></div>
+    <div class="sb-panel red"><h3>敌方（红色方）</h3><div id="sb-red"></div></div>
+  </div>
+
+  <!-- 死亡遮罩 -->
+  <div id="death-overlay">
+    <div class="dead-text">你已阵亡</div>
+    <div id="death-timer">10</div>
+  </div>
+
+  <!-- 暂停 / 帮助 -->
+  <div id="pause-overlay">
+    <div class="pause-box">
+      <h2>游戏暂停</h2>
+      <div class="help-grid">
+        <div><b>右键</b> 移动 / 攻击</div>
+        <div><b>Q W E R</b> 释放技能</div>
+        <div><b>点 +号</b> 技能加点</div>
+        <div><b>D</b> 闪现</div>
+        <div><b>F</b> 治疗术</div>
+        <div><b>B</b> 回城</div>
+        <div><b>P</b> 打开商店</div>
+        <div><b>Tab</b> 战绩面板</div>
+        <div><b>S</b> 停止</div>
+        <div><b>空格</b> 镜头回中</div>
+        <div><b>Y</b> 锁定/解锁视角</div>
+        <div><b>M</b> 声音开关</div>
+      </div>
+      <button id="btn-resume">继续游戏</button>
+      <button id="btn-surrender">投降</button>
+    </div>
+  </div>
+
+  <!-- 结束 -->
+  <div id="end-screen">
+    <div id="end-title"></div>
+    <div id="end-stats"></div>
+    <button id="btn-again">再 来 一 局</button>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<script src="js/data.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/render.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

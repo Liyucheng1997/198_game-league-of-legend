@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "lol-web",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8196"],
+      "port": 8196
+    }
+  ]
+}
