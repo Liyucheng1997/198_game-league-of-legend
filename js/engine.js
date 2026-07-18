@@ -233,6 +233,7 @@ function updateProjectiles(g,dt){
 /* ---------- 普攻 ---------- */
 function doAutoAttack(g, u, t){
   u.faceAngle = Math.atan2(t.y-u.y, t.x-u.x);
+  if(u.type==='champ') setHeroAnim(g,u,'attack',0.34,u.faceAngle);
   const fire = (victim)=>{
     let dmg = u.stat? u.stat('ad') : u.ad;
     let critted=false;
@@ -517,8 +518,8 @@ class Game {
 
     // 英雄阵容
     const others = CHAMPIONS.filter(c=>c.id!==playerChampId);
-    const shuffled = others.slice().sort(()=>Math.random()-0.5);
-    const enemyPicks = CHAMPIONS.slice().sort(()=>Math.random()-0.5);
+    const shuffled = others.slice().sort(()=>Math.random()-0.5).slice(0,4);
+    const enemyPicks = CHAMPIONS.slice().sort(()=>Math.random()-0.5).slice(0,5);
     this.champs=[];
     // 玩家：中路
     this.player = new Champion(CHAMP_BY_ID[playerChampId], TEAM_BLUE, {displayName:'你', lane:'mid'});

@@ -227,6 +227,12 @@ function drawChamp(ctx,g,c){
   }
   // 本体
   const ring = c===g.player? '#f0d87a' : TEAM_COLOR[c.team];
+  if(c.def.model==='landuo'){
+    drawLanduoModel(ctx,g,c,ring);
+    if(c.isStunned()) drawStunStars(ctx,g,c);
+    ctx.restore();
+    return;
+  }
   ctx.strokeStyle=ring; ctx.lineWidth=3.5;
   ctx.fillStyle=c.def.color;
   ctx.beginPath(); ctx.arc(c.x,c.y,c.radius,0,7); ctx.fill(); ctx.stroke();
@@ -241,11 +247,129 @@ function drawChamp(ctx,g,c){
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillText(c.def.char, c.x, c.y+1.5);
   // 眩晕星星
-  if(c.isStunned()){
-    ctx.fillStyle='#ffe66e'; ctx.font='14px sans-serif';
-    for(let i=0;i<3;i++){ const a=g.t*4+i*2.1; ctx.fillText('★', c.x+Math.cos(a)*16, c.y-c.radius-10+Math.sin(a)*4); }
+  if(c.isStunned()) drawStunStars(ctx,g,c);
+  ctx.restore();
+}
+
+function drawStunStars(ctx,g,c){
+  ctx.fillStyle='#ffe66e'; ctx.font='14px sans-serif'; ctx.textAlign='center';
+  for(let i=0;i<3;i++){ const a=g.t*4+i*2.1; ctx.fillText('★', c.x+Math.cos(a)*16, c.y-c.radius-10+Math.sin(a)*4); }
+}
+
+/* ---------- 岚铎：程序化分件模型与动作 ---------- */
+function drawLanduoModel(ctx,g,c,ring){
+  const anim=c.heroAnim;
+  let type='idle', p=0;
+  if(anim && g.t<anim.start+anim.dur){ type=anim.type; p=Math.max(0,Math.min(1,(g.t-anim.start)/anim.dur)); }
+  const moving=!anim || g.t>=anim.start+anim.dur ? (c.order.type==='move'||(c.order.type==='attack'&&c.atkTarget&&dist(c,c.atkTarget)>c.stat('range')+45)) : false;
+  const walk=moving?Math.sin(g.t*11):0;
+  const idle=Math.sin(g.t*2.4)*0.7;
+  const jump=type==='r'?Math.sin(Math.PI*p)*34:0;
+  const squash=type==='r'&&p>0.82?1-(p-0.82)*0.8:1;
+  const attackSwing=type==='attack'?(-1.15+2.5*(1-Math.pow(1-p,2))):0;
+  const qSwing=type==='q'?(-1.45+3.05*(p<0.72?(p/0.72):1)):0;
+  const eLean=type==='e'?7*Math.sin(Math.PI*p):0;
+  const wPulse=type==='w'?Math.sin(Math.PI*p):0;
+
+  ctx.save();
+  ctx.translate(c.x,c.y-jump);
+  ctx.rotate(c.faceAngle+Math.PI/2);
+  ctx.scale(1/squash,squash);
+  ctx.translate(0,idle-eLean);
+
+  // 选中环与铸火层数
+  ctx.strokeStyle=ring; ctx.lineWidth=2.2; ctx.globalAlpha=.9;
+  ctx.beginPath(); ctx.ellipse(0,8,27,15,0,0,7); ctx.stroke(); ctx.globalAlpha=1;
+  for(let i=0;i<3;i++){
+    const on=i<(c.forgeStacks||0), x=(i-1)*9;
+    ctx.shadowColor=on?'#ffb43f':'transparent'; ctx.shadowBlur=on?9:0;
+    ctx.fillStyle=on?'#ffc45a':'#24383a';
+    ctx.beginPath(); ctx.moveTo(x,-43); ctx.lineTo(x+4,-37); ctx.lineTo(x,-33); ctx.lineTo(x-4,-37); ctx.closePath(); ctx.fill();
+  }
+  ctx.shadowBlur=0;
+
+  // 短披风（身体后方）
+  ctx.fillStyle='#11191b';
+  ctx.beginPath(); ctx.moveTo(-15,1); ctx.lineTo(15,1); ctx.lineTo(12,28); ctx.lineTo(2,22+walk*2); ctx.lineTo(-8,30); ctx.closePath(); ctx.fill();
+
+  // 双腿，奔跑时交替摆动
+  drawLanduoLimb(ctx,-8,11+walk*5,-0.10-walk*.18);
+  drawLanduoLimb(ctx,8,11-walk*5,0.10+walk*.18);
+
+  // 躯干：青黑多边形胸甲
+  ctx.fillStyle='#0b1719'; ctx.strokeStyle='#9c7a45'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(-19,8); ctx.lineTo(-16,-16); ctx.lineTo(-8,-27); ctx.lineTo(9,-27); ctx.lineTo(18,-14); ctx.lineTo(20,8); ctx.lineTo(0,18); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#164d52';
+  ctx.beginPath(); ctx.moveTo(-14,-14); ctx.lineTo(0,-23); ctx.lineTo(14,-13); ctx.lineTo(11,5); ctx.lineTo(0,12); ctx.lineTo(-12,4); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle='#d6923a'; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(0,-21); ctx.lineTo(-3,-8); ctx.lineTo(4,-2); ctx.lineTo(0,11); ctx.stroke();
+
+  // 左侧堡垒肩甲与右肩，W 时外扩
+  drawLanduoShoulder(ctx,-21-wPulse*3,-13,1.18+wPulse*.12,true);
+  drawLanduoShoulder(ctx,18+wPulse*2,-14,.82+wPulse*.08,false);
+  drawLanduoArm(ctx,-20-wPulse*5,-2, type==='w'?-0.55:-0.15-walk*.12, true);
+  drawLanduoArm(ctx,18,0, type==='w'?0.65:0.18+walk*.12, false);
+
+  // 头盔与熔金面窗
+  ctx.fillStyle='#101b1d'; ctx.strokeStyle='#a98654'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(-9,-29); ctx.lineTo(-7,-41); ctx.lineTo(0,-46); ctx.lineTo(8,-40); ctx.lineTo(10,-28); ctx.lineTo(0,-23); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#ffbd45'; ctx.shadowColor='#ff9b2f'; ctx.shadowBlur=8;
+  ctx.beginPath(); ctx.moveTo(-6,-37); ctx.lineTo(0,-33); ctx.lineTo(7,-38); ctx.lineTo(5,-31); ctx.lineTo(0,-27); ctx.lineTo(-5,-31); ctx.closePath(); ctx.fill(); ctx.shadowBlur=0;
+  ctx.strokeStyle='#42696b'; ctx.beginPath(); ctx.moveTo(0,-45); ctx.lineTo(0,-38); ctx.stroke();
+
+  // 陨铁巨刃：普攻/Q 做完整横扫，E 贴地拖刃
+  ctx.save();
+  const bx=19, by=2;
+  ctx.translate(bx,by);
+  let bladeRot=.38+walk*.08;
+  if(type==='attack') bladeRot=attackSwing;
+  if(type==='q') bladeRot=qSwing;
+  if(type==='e') bladeRot=1.18;
+  if(type==='r') bladeRot=-0.15+p*.35;
+  ctx.rotate(bladeRot);
+  drawLanduoBlade(ctx,type==='q'?1.12:1);
+  ctx.restore();
+
+  // W 的正面能量壁
+  if(type==='w'){
+    ctx.globalAlpha=.25+.45*wPulse; ctx.fillStyle='#63d5c6'; ctx.strokeStyle='#ffd16a'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(-30,-30); ctx.lineTo(30,-30); ctx.lineTo(25,-5); ctx.lineTo(0,8); ctx.lineTo(-25,-5); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.globalAlpha=1;
   }
   ctx.restore();
+}
+
+function drawLanduoLimb(ctx,x,y,rot){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot);
+  ctx.fillStyle='#101719'; ctx.strokeStyle='#7c674b'; ctx.lineWidth=1.2;
+  ctx.fillRect(-6,-2,12,17); ctx.strokeRect(-6,-2,12,17);
+  ctx.fillStyle='#16464a'; ctx.beginPath(); ctx.moveTo(-8,9); ctx.lineTo(7,8); ctx.lineTo(9,18); ctx.lineTo(-9,18); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
+function drawLanduoShoulder(ctx,x,y,s,bastion){
+  ctx.save(); ctx.translate(x,y); ctx.scale(s,s);
+  ctx.fillStyle='#123c40'; ctx.strokeStyle='#a4804f'; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(-10,7); ctx.lineTo(-12,-4); ctx.lineTo(-4,-12); ctx.lineTo(9,-8); ctx.lineTo(12,5); ctx.lineTo(4,11); ctx.closePath(); ctx.fill(); ctx.stroke();
+  if(bastion){ ctx.fillStyle='#d58a35'; ctx.beginPath(); ctx.moveTo(-7,-3);ctx.lineTo(3,-8);ctx.lineTo(7,3);ctx.lineTo(0,7);ctx.closePath();ctx.fill(); }
+  ctx.restore();
+}
+function drawLanduoArm(ctx,x,y,rot,left){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot);
+  ctx.fillStyle='#0d1719'; ctx.strokeStyle='#806b50'; ctx.lineWidth=1.1;
+  ctx.beginPath(); ctx.roundRect(-5,-2,10,22,4); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#15474b'; ctx.fillRect(-7,8,14,10); ctx.strokeRect(-7,8,14,10);
+  ctx.restore();
+}
+function drawLanduoBlade(ctx,s){
+  ctx.scale(s,s);
+  // 手柄沿局部 -Y，刀身向角色前方伸出
+  ctx.strokeStyle='#2a2020'; ctx.lineWidth=5; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(0,10); ctx.lineTo(0,-13); ctx.stroke();
+  ctx.strokeStyle='#ba8748'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(-9,-10); ctx.lineTo(9,-10); ctx.stroke();
+  ctx.fillStyle='#172326'; ctx.strokeStyle='#9b7a4e'; ctx.lineWidth=1.7;
+  ctx.beginPath(); ctx.moveTo(-9,-10); ctx.lineTo(-15,-47); ctx.lineTo(-8,-68); ctx.lineTo(10,-57); ctx.lineTo(14,-18); ctx.lineTo(7,-10); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.strokeStyle='#ef9a34'; ctx.shadowColor='#ff9d2e'; ctx.shadowBlur=6; ctx.lineWidth=2.3;
+  ctx.beginPath(); ctx.moveTo(-7,-18); ctx.lineTo(2,-28); ctx.lineTo(-3,-42); ctx.lineTo(7,-55); ctx.stroke(); ctx.shadowBlur=0;
+  ctx.fillStyle='#091113'; ctx.beginPath(); ctx.moveTo(4,-20);ctx.lineTo(8,-27);ctx.lineTo(7,-38);ctx.lineTo(1,-31);ctx.closePath();ctx.fill();
 }
 
 function drawBar(ctx,g,u,w,h,dy){
@@ -319,6 +443,30 @@ function drawEffect(ctx,g,e){
     ctx.globalAlpha=1-p; ctx.strokeStyle=e.color; ctx.lineWidth=2.5;
     ctx.beginPath(); ctx.arc(e.x,e.y,18*(1-p*0.6),0,7); ctx.stroke();
     ctx.beginPath(); ctx.arc(e.x,e.y,7,0,7); ctx.stroke();
+  } else if(e.kind==='forgeSweep'){
+    ctx.globalAlpha=(1-p)*.9; ctx.strokeStyle=e.color; ctx.lineWidth=e.empowered?18:12; ctx.lineCap='round';
+    ctx.beginPath(); ctx.arc(e.x,e.y,e.r*(.72+.22*p),e.ang-e.spread+p*.25,e.ang+e.spread+p*.25); ctx.stroke();
+    ctx.globalAlpha=(1-p)*.55; ctx.strokeStyle='#ffe1a0'; ctx.lineWidth=3; ctx.stroke();
+  } else if(e.kind==='bastion'){
+    ctx.globalAlpha=(1-p)*.8; ctx.strokeStyle=e.color; ctx.lineWidth=6*(1-p)+2;
+    ctx.beginPath(); ctx.arc(e.x,e.y,e.r*(.75+.3*p),0,7); ctx.stroke();
+    for(let i=0;i<6;i++){ const a=i*Math.PI/3; ctx.beginPath(); ctx.moveTo(e.x+Math.cos(a)*35,e.y+Math.sin(a)*35); ctx.lineTo(e.x+Math.cos(a)*e.r,e.y+Math.sin(a)*e.r); ctx.stroke(); }
+  } else if(e.kind==='forgeBurst'){
+    ctx.globalAlpha=(1-p)*.75; ctx.strokeStyle=e.color; ctx.lineWidth=12*(1-p)+2;
+    ctx.beginPath(); ctx.arc(e.x,e.y,e.r*(.15+.85*p),0,7); ctx.stroke();
+  } else if(e.kind==='forgeDash'){
+    ctx.globalAlpha=1-p; ctx.strokeStyle=e.color; ctx.lineWidth=18*(1-p)+5; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(e.x,e.y); ctx.lineTo(e.x2,e.y2); ctx.stroke();
+    ctx.strokeStyle='#ffd38a'; ctx.lineWidth=3; ctx.stroke();
+  } else if(e.kind==='leapTrail'){
+    ctx.globalAlpha=(1-p)*.8; ctx.strokeStyle=e.color; ctx.lineWidth=5; ctx.setLineDash([10,8]);
+    ctx.beginPath(); ctx.moveTo(e.x,e.y); ctx.quadraticCurveTo((e.x+e.x2)/2,(e.y+e.y2)/2-120,e.x2,e.y2); ctx.stroke();
+  } else if(e.kind==='starCrater'){
+    ctx.globalAlpha=(1-p)*.8; ctx.fillStyle=e.color;
+    ctx.beginPath();
+    for(let i=0;i<16;i++){ const a=i*Math.PI/8, r=i%2?e.r*(.45+.45*p):e.r*(.75+.25*p); const x=e.x+Math.cos(a)*r,y=e.y+Math.sin(a)*r; i?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle='#ffe2a0';ctx.lineWidth=5;ctx.beginPath();ctx.arc(e.x,e.y,e.r*(.2+.65*p),0,7);ctx.stroke();
   }
   ctx.restore();
 }

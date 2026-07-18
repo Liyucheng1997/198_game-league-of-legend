@@ -54,6 +54,82 @@ function lvlv(arr, lvl){ return arr[Math.min(lvl, arr.length)-1]; }
 /* ---------- 英雄 ---------- */
 const CHAMPIONS = [
 {
+  id:'landuo', name:'岚铎', title:'裂星壁垒', char:'岚', color:'#164d52',
+  portrait:'assets/heroes/landuo/portrait.png', portraitPos:'50% 42%', model:'landuo',
+  ranged:false, range:105,
+  base:{hp:690, hpG:104, mp:310, mpG:18, hp5:8.5, mp5:7, ad:68, adG:4.2, armor:40, armG:4.5, mr:33, mrG:1.6, as:0.63, asG:2.2, ms:169},
+  passive:'熔芯：施放基础技能积累 1 层铸火（最多 3 层）。满层后，下一个基础技能获得独特强化。角色模型腰甲上的熔金铆钉会显示当前层数。',
+  skillOrder:['Q','E','W'],
+  build:['dshield','boots','bc','tabi','warmog','randuin','visage','thorn'],
+  abilities:[
+    { key:'Q', name:'断岳横斩', icon:'◒', maxLvl:5, aim:'pos', range:280, cd:[8,7.5,7,6.5,6], mana:[35,35,35,35,35],
+      desc:l=>`挥动陨铁战刃横扫前方，造成 ${45+30*l} (+90%AD) 物理伤害并减速 25%。满铸火强化：范围扩大、伤害提升 30%并击晕 0.8 秒。`,
+      ai:{when:'engage', range:250},
+      cast(g,c,aim){ const l=this._l(c), empowered=landuoForge(c); const ang=Math.atan2(aim.y-c.y,aim.x-c.x);
+        setHeroAnim(g,c,'q',0.48,ang); const r=empowered?275:225, spread=empowered?1.05:0.82;
+        addEffect(g,{kind:'forgeSweep',x:c.x,y:c.y,ang,spread,r,color:empowered?'#ffd36a':'#e48732',dur:0.48,empowered});
+        for(const e of enemiesIn(g,c.team,c.x,c.y,r)){
+          const a2=Math.atan2(e.y-c.y,e.x-c.x); let d=Math.abs(a2-ang); if(d>Math.PI)d=2*Math.PI-d;
+          if(d<=spread){ dealDamage(g,c,e,((45+30*l)+0.9*c.stat('ad'))*(empowered?1.3:1),'phys');
+            addBuff(e,{id:'landuoQslow',dur:1.5,slow:25,fx:'#e99a43'});
+            if(empowered) addBuff(e,{id:'landuoQstun',dur:0.8,stun:true,fx:'#ffd36a'}); }
+        }
+      }
+    },
+    { key:'W', name:'铸垒回响', icon:'⬢', maxLvl:5, aim:'self', cd:[17,16,15,14,13], mana:[50,55,60,65,70],
+      desc:l=>`竖起壁垒，获得 ${70+40*l} (+8%最大生命值) 护盾与 25% 减伤，2.5 秒后震裂，对周围敌人造成魔法伤害。满铸火强化：护盾提高 50%，震裂附带 40% 减速。`,
+      ai:{when:'defend', range:360},
+      cast(g,c){ const l=this._l(c), empowered=landuoForge(c), shield=((70+40*l)+c.maxHp*0.08)*(empowered?1.5:1);
+        setHeroAnim(g,c,'w',0.62,c.faceAngle); addShield(c,shield,2.5);
+        addBuff(c,{id:'landuoW',dur:2.5,stats:{dr:25},fx:empowered?'#ffd36a':'#55c3b8'});
+        addEffect(g,{kind:'bastion',x:c.x,y:c.y,r:80,color:empowered?'#ffd36a':'#55c3b8',dur:0.65});
+        addDelayed(g,2.5,()=>{ if(c.dead) return;
+          addEffect(g,{kind:'forgeBurst',x:c.x,y:c.y,r:empowered?210:175,color:empowered?'rgba(255,190,74,.8)':'rgba(75,188,174,.68)',dur:0.55});
+          for(const e of enemiesIn(g,c.team,c.x,c.y,empowered?210:175)){
+            dealDamage(g,c,e,(30+25*l)+0.35*c.stat('ad'),'magic');
+            if(empowered) addBuff(e,{id:'landuoWslow',dur:1.5,slow:40,fx:'#ffd36a'});
+          }
+        });
+      }
+    },
+    { key:'E', name:'熔痕突进', icon:'➤', maxLvl:5, aim:'pos', range:390, cd:[13,12,11,10,9], mana:[45,50,55,60,65],
+      desc:l=>`拖刃突进，对路径上的敌人造成 ${35+28*l} (+75%AD) 物理伤害。满铸火强化：留下 3 秒熔痕，每秒造成魔法伤害并减速。`,
+      ai:{when:'engage', range:390},
+      cast(g,c,aim){ const l=this._l(c), empowered=landuoForge(c), sx=c.x, sy=c.y;
+        const ang=Math.atan2(aim.y-sy,aim.x-sx), d=Math.min(390,Math.hypot(aim.x-sx,aim.y-sy));
+        const ex=clampW(sx+Math.cos(ang)*d), ey=clampW(sy+Math.sin(ang)*d);
+        setHeroAnim(g,c,'e',0.38,ang); addEffect(g,{kind:'forgeDash',x:sx,y:sy,x2:ex,y2:ey,color:empowered?'#ffd36a':'#d9752a',dur:0.42});
+        for(const u of g.units()){
+          if(u.dead||u.untargetable||u.type==='tower'||u.type==='inhib'||u.type==='nexus') continue;
+          if(u.type!=='monster' && u.team===c.team) continue;
+          if(distToSeg(u.x,u.y,sx,sy,ex,ey)<55+u.radius) dealDamage(g,c,u,(35+28*l)+0.75*c.stat('ad'),'phys');
+        }
+        c.x=ex; c.y=ey;
+        if(empowered) addZone(g,{x:(sx+ex)/2,y:(sy+ey)/2,r:110,team:c.team,dur:3,tickEvery:0.75,color:'rgba(238,125,38,.20)',
+          onTick:(g,u)=>{ dealDamage(g,c,u,(12+7*l)+0.08*c.stat('ad'),'magic'); addBuff(u,{id:'landuoEslow',dur:0.9,slow:25}); }});
+      }
+    },
+    { key:'R', name:'天坠·裂星', icon:'✦', maxLvl:3, aim:'pos', range:620, cd:[110,95,80], mana:[100,100,100],
+      desc:l=>`跃向目标区域并砸裂地面，造成 ${150+125*l} (+110%额外AD) 物理伤害和目标 18% 已损失生命值的魔法伤害，中心敌人被击晕 1.25 秒。施放后立即充满铸火。`,
+      ai:{when:'burst', range:600},
+      cast(g,c,aim){ const l=this._l(c), sx=c.x, sy=c.y, ang=Math.atan2(aim.y-sy,aim.x-sx), d=Math.min(620,dist(c,aim));
+        const ex=clampW(sx+Math.cos(ang)*d), ey=clampW(sy+Math.sin(ang)*d);
+        setHeroAnim(g,c,'r',0.82,ang); c.untargetable=true; c.order={type:'hold'};
+        addEffect(g,{kind:'leapTrail',x:sx,y:sy,x2:ex,y2:ey,color:'#ffc45a',dur:0.7,unit:c});
+        addDelayed(g,0.68,()=>{ if(c.dead){c.untargetable=false;return;} c.untargetable=false; c.x=ex; c.y=ey; c.forgeStacks=3;
+          addEffect(g,{kind:'starCrater',x:ex,y:ey,r:250,color:'rgba(255,171,55,.88)',dur:0.85});
+          for(const e of enemiesIn(g,c.team,ex,ey,250)){
+            const bonusAd=Math.max(0,c.stat('ad')-(c.def.base.ad+c.def.base.adG*(c.level-1)));
+            dealDamage(g,c,e,(150+125*l)+1.1*bonusAd,'phys');
+            dealDamage(g,c,e,0.18*(e.maxHp-e.hp),'magic');
+            if(Math.hypot(e.x-ex,e.y-ey)<125+e.radius) addBuff(e,{id:'landuoRstun',dur:1.25,stun:true,fx:'#ffd36a'});
+          }
+        });
+      }
+    },
+  ],
+},
+{
   id:'garen', name:'盖伦', title:'德玛西亚之力', char:'盖', color:'#4a7ab5',
   ranged:false, range:95,
   base:{hp:660, hpG:98, mp:0, mpG:0, hp5:8, mp5:0, ad:66, adG:4.5, armor:38, armG:4.2, mr:32, mrG:1.5, as:0.66, asG:2.9, ms:172},
@@ -269,6 +345,14 @@ const CHAMPIONS = [
 },
 ];
 const CHAMP_BY_ID = Object.fromEntries(CHAMPIONS.map(c=>[c.id,c]));
+
+/* 岚铎：基础技能在三层铸火时消耗强化，否则积累一层。 */
+function landuoForge(c){
+  const stacks=c.forgeStacks||0;
+  if(stacks>=3){ c.forgeStacks=0; return true; }
+  c.forgeStacks=Math.min(3,stacks+1); return false;
+}
+function setHeroAnim(g,c,type,dur,angle){ c.heroAnim={type,start:g.t,dur,angle:angle===undefined?c.faceAngle:angle}; }
 
 /* 安妮被动计数 */
 function annieCount(g,c){ c.annieStack=(c.annieStack||0)+1; if(c.annieStack>=5) c.annieStack=5; }

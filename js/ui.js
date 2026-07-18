@@ -81,7 +81,10 @@ function killFeed(g, killer, victim, killerName){
 
 /* ---------- 头像绘制 ---------- */
 function portraitHTML(def, cls=''){
-  return `<div class="portrait ${cls}" style="--pc:${def.color}"><span>${def.char}</span></div>`;
+  const content=def.portrait
+    ? `<img src="${def.portrait}" alt="${def.name}" style="object-position:${def.portraitPos||'50% 50%'}">`
+    : `<span>${def.char}</span>`;
+  return `<div class="portrait ${cls} ${def.portrait?'hero-art':''}" style="--pc:${def.color}">${content}</div>`;
 }
 
 /* ---------- HUD 构建 ---------- */

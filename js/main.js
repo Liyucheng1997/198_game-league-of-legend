@@ -30,11 +30,13 @@ function selectChamp(def){
   $('#sel-skills').innerHTML=def.abilities.map(a=>
     `<div class="sel-skill" title="${a.name}"><span class="ss-icon">${a.icon}</span><span class="ss-key">${a.key}</span><div class="ss-tip"><b>${a.name}</b><br>${a.desc(1)}</div></div>`).join('');
   // 阵容预览：己方 = 玩家 + 其余英雄；敌方 = 全部英雄
+  const allyPreview=CHAMPIONS.filter(c=>c.id!==def.id).slice(0,4);
+  const enemyPreview=[def,...CHAMPIONS.filter(c=>c.id!==def.id)].slice(0,5);
   $('#team-blue-list').innerHTML =
     `<div class="team-row me">${portraitHTML(def)}<span>你（中路）</span></div>` +
-    CHAMPIONS.filter(c=>c.id!==def.id).map(c=>`<div class="team-row">${portraitHTML(c)}<span>电脑·${c.name}</span></div>`).join('');
+    allyPreview.map(c=>`<div class="team-row">${portraitHTML(c)}<span>电脑·${c.name}</span></div>`).join('');
   $('#team-red-list').innerHTML =
-    CHAMPIONS.map(c=>`<div class="team-row">${portraitHTML(c)}<span>电脑·${c.name}</span></div>`).join('');
+    enemyPreview.map(c=>`<div class="team-row">${portraitHTML(c)}<span>电脑·${c.name}</span></div>`).join('');
   sfx('click');
 }
 
