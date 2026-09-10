@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.part
+# Rebuildable source archives remain on disk; commit runtime assets and manifests.
+assets/map/source/
+assets/models/source/
+scripts/reference-nav/
+scripts/reference-viewer.txt

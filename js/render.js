@@ -70,6 +70,8 @@ function renderWorld(g, ctx, cam){
   // 地形
   const ts=WORLD/g.terrain.width;
   ctx.drawImage(g.terrain, 0,0, g.terrain.width,g.terrain.height, 0,0, WORLD, WORLD);
+  if(typeof drawRiftFog==='function')drawRiftFog(g,ctx);
+  if(typeof drawRiftDetails==='function')drawRiftDetails(g,ctx);
 
   const view = {x1:cam.x-W/2/cam.zoom-100, y1:cam.y-H/2/cam.zoom-100, x2:cam.x+W/2/cam.zoom+100, y2:cam.y+H/2/cam.zoom+100};
   const inView=u=>u.x>view.x1&&u.x<view.x2&&u.y>view.y1&&u.y<view.y2;
@@ -88,7 +90,8 @@ function renderWorld(g, ctx, cam){
   for(const n of g.nexuses) if(inView(n)) drawNexus(ctx,g,n);
 
   // 野怪
-  for(const m of g.monsters) if(!m.dead&&inView(m)) drawMonster(ctx,g,m);
+  for(const m of g.monsters) if(!m.dead&&inView(m)&&m.visibleTo(g.playerTeam)) drawMonster(ctx,g,m);
+  for(const p of g.pets||[])if(!p.dead&&inView(p)&&visible(p))drawPet(ctx,g,p);
 
   // 小兵
   for(const m of g.minions) if(!m.dead&&inView(m)&&visible(m)) drawMinion(ctx,g,m);
@@ -114,7 +117,7 @@ function renderWorld(g, ctx, cam){
   for(const t of g.towers) if(!t.dead&&inView(t)&&t.hp<t.maxHp) drawBar(ctx,g,t,70,7,-t.radius-26);
   for(const b of g.inhibs) if(!b.dead&&inView(b)&&b.hp<b.maxHp) drawBar(ctx,g,b,64,7,-b.radius-20);
   for(const n of g.nexuses) if(!n.dead&&inView(n)&&n.hp<n.maxHp) drawBar(ctx,g,n,90,8,-n.radius-24);
-  for(const m of g.monsters) if(!m.dead&&inView(m)&&m.hp<m.maxHp) drawBar(ctx,g,m,80,7,-m.radius-18);
+  for(const m of g.monsters) if(!m.dead&&inView(m)&&m.visibleTo(g.playerTeam)&&m.hp<m.maxHp) drawBar(ctx,g,m,80,7,-m.radius-18);
   for(const m of g.minions) if(!m.dead&&inView(m)&&visible(m)) drawBar(ctx,g,m,34,4,-m.radius-10);
   for(const c of g.champs) if(!c.dead&&inView(c)&&visible(c)) drawChampBar(ctx,g,c);
 
@@ -476,6 +479,7 @@ function renderMinimap(g, ctx, cam, mainCanvas){
   const S=ctx.canvas.width, s=S/WORLD;
   ctx.clearRect(0,0,S,S);
   ctx.drawImage(g.terrain,0,0,g.terrain.width,g.terrain.height,0,0,S,S);
+  if(g.fogCanvas&&!(g.training&&g.practiceReveal))ctx.drawImage(g.fogCanvas,0,0,S,S);
   ctx.fillStyle='rgba(0,0,10,.25)'; ctx.fillRect(0,0,S,S);
   // 建筑
   for(const t of g.towers){ if(t.dead) continue;
@@ -493,7 +497,7 @@ function renderMinimap(g, ctx, cam, mainCanvas){
     ctx.strokeStyle='#fff'; ctx.lineWidth=1; ctx.strokeRect(-5,-5,10,10); ctx.restore();
   }
   // 野怪
-  for(const m of g.monsters){ if(m.dead) continue;
+  for(const m of g.monsters){ if(m.dead||!m.visibleTo(g.playerTeam)) continue;
     ctx.fillStyle= m.kind==='baron'? '#b06bff':'#e8a04a';
     ctx.beginPath(); ctx.arc(m.x*s,m.y*s,4,0,7); ctx.fill();
   }
@@ -513,6 +517,7 @@ function renderMinimap(g, ctx, cam, mainCanvas){
     ctx.lineWidth=1.8;
     ctx.strokeStyle = c===g.player? '#fff' : TEAM_COLOR_LIGHT[c.team];
     ctx.stroke();
+    if(typeof RIFT_IMAGES!=='undefined'){const img=RIFT_IMAGES[c.def.id];if(img?.complete&&img.naturalWidth){ctx.save();ctx.beginPath();ctx.arc(c.x*s,c.y*s,5,0,7);ctx.clip();ctx.drawImage(img,c.x*s-5,c.y*s-5,10,10);ctx.restore();}}
   }
   // 相机视野框
   const vw=mainCanvas.width/cam.zoom*s, vh=mainCanvas.height/cam.zoom*s;

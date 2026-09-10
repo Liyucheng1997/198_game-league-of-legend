@@ -3,6 +3,7 @@
 
 const $ = s=>document.querySelector(s);
 const $$ = s=>[...document.querySelectorAll(s)];
+function iconHTML(a){return a.iconImage?`<img src="${a.iconImage}" alt="${a.name}" draggable="false">`:a.icon;}
 
 /* ---------- 音效（WebAudio 合成） ---------- */
 let audioCtx=null, soundOn=true, lastSfx={};
@@ -97,7 +98,7 @@ function buildHUD(g){
     const d=document.createElement('div');
     d.className='skill'; d.dataset.idx=i;
     d.innerHTML=`<div class="skill-up" data-up="${i}">+</div>
-      <div class="skill-icon">${a.def.icon}</div>
+      <div class="skill-icon">${iconHTML(a.def)}</div>
       <div class="skill-cd"></div>
       <div class="skill-key">${a.def.key}</div>
       <div class="skill-pips">${'<i></i>'.repeat(a.def.maxLvl)}</div>`;
@@ -108,7 +109,7 @@ function buildHUD(g){
   p.summs.forEach((s,i)=>{
     const d=document.createElement('div');
     d.className='skill summ'; d.dataset.summ=i;
-    d.innerHTML=`<div class="skill-icon">${s.def.icon}</div><div class="skill-cd"></div><div class="skill-key">${s.def.key}</div>`;
+    d.innerHTML=`<div class="skill-icon">${iconHTML(s.def)}</div><div class="skill-cd"></div><div class="skill-key">${s.def.key}</div>`;
     d.addEventListener('mouseenter',e=>showTip(e,`<b>${s.def.name}</b><br>${s.def.desc}<br><span class="tip-dim">冷却 ${s.def.cd} 秒</span>`));
     d.addEventListener('mouseleave',hideTip);
     sk.appendChild(d);
@@ -162,7 +163,11 @@ function updateHUD(g){
     if(el.dataset.idx!==undefined){
       const i=+el.dataset.idx, a=p.abilities[i];
       const cdEl=el.querySelector('.skill-cd');
-      const remain=a.readyAt-g.t;
+      const recast=a.def.recastWhen?.(g,p);
+      const remain=recast?0:a.def.maxCharges?(a.charges>0?0:a.rechargeAt-g.t):a.readyAt-g.t;
+      el.classList.toggle('recast',!!recast);
+      el.title=a.def.maxCharges?`${a.def.name} · 充能 ${a.charges}/${a.def.maxCharges}`:a.def.name;
+      el.querySelector('.skill-key').textContent=a.def.key+(a.def.maxCharges?' · '+a.charges:recast?' ↻':'');
       el.classList.toggle('locked', a.lvl===0);
       el.classList.toggle('nomana', a.lvl>0 && p.mp<lvlv(a.def.mana,Math.max(1,a.lvl)));
       if(a.lvl>0 && remain>0){ cdEl.style.display='flex'; cdEl.textContent=remain>1?Math.ceil(remain):remain.toFixed(1); }
@@ -179,8 +184,8 @@ function updateHUD(g){
   // 物品
   $$('#hud-items .item-slot').forEach((el,i)=>{
     const it=p.items[i];
-    if(it){ el.textContent=it.icon; el.classList.add('filled'); el.title=it.name; }
-    else { el.textContent=''; el.classList.remove('filled'); }
+    if(it){ if(el.dataset.item!==it.id){el.innerHTML=iconHTML(it);el.dataset.item=it.id;} el.classList.add('filled'); el.title=it.name; }
+    else { el.textContent='';el.dataset.item=''; el.classList.remove('filled'); }
   });
   // 金币 / KDA / CS
   $('#hud-gold').textContent=Math.floor(p.gold);
@@ -207,6 +212,12 @@ function updateHUD(g){
   if(p.order.type==='recall'){ rc.style.display='block';
     $('#recall-fill').style.width=(100*(1-(p.order.doneAt-g.t)/8))+'%'; }
   else rc.style.display='none';
+  if($('#ability-hint')){
+    const resource=p.def.id==='ashe'?`专注 ${p.focus||0}/4`:p.def.id==='annie'?`嗜火 ${p.annieStack||0}/4`:p.def.id==='ahri'?`魂魄 ${p.soulCount||0}/9` : p.def.id==='caitlyn'?`爆头 ${p.headshots||0}/6`:p.def.id==='yi'?`双重打击 ${p.doubleStrike||0}/4`:'';
+    $('#ability-hint').textContent=`${p.def.name} · ${ROLE_NAMES[p.role]||''}　${resource}　${g.t<g.wardReadyAt?'守卫 '+Math.ceil(g.wardReadyAt-g.t)+'s':'4 守卫就绪'}`;
+    const fmt=v=>`${Math.floor(v/60)}:${String(Math.floor(v%60)).padStart(2,'0')}`;
+    $('#objective-timers').textContent=g.monsters.filter(m=>m.kind==='dragon'||m.kind==='baron').map(m=>`${m.kind==='dragon'?'巨龙':'男爵'} ${m.dead?fmt(Math.max(0,m.respawnAt-g.t)):'已刷新'}`).join('　·　');
+  }
 }
 
 /* ---------- 商店 ---------- */
@@ -227,31 +238,29 @@ function renderShopTab(g,tab){
   for(const it of ITEMS.filter(i=>i.tab===tab)){
     const d=document.createElement('div');
     d.className='shop-item'; d.dataset.id=it.id;
-    d.innerHTML=`<div class="si-icon">${it.icon}</div><div class="si-body"><div class="si-name">${it.name}</div><div class="si-stats">${itemDesc(it)}</div></div><div class="si-price">${it.price}</div>`;
+    d.innerHTML=`<div class="si-icon">${iconHTML(it)}</div><div class="si-body"><div class="si-name">${it.name}</div><div class="si-stats">${itemDesc(it)}</div></div><div class="si-price">${it.price}</div>`;
     d.addEventListener('click',()=>buyItem(g,it));
-    d.addEventListener('mouseenter',e=>showTip(e,`<b>${it.name}</b><br>${itemDesc(it)}<br><span class="tip-dim">价格 ${it.price} 金币（右键装备栏出售 70%）</span>`));
+    d.addEventListener('mouseenter',e=>showTip(e,`<b>${it.name}</b><br>${itemDesc(it)}<br><span class="tip-dim">总价 ${it.price} 金币，当前合成价 ${itemPurchaseQuote(g.player,it).price}；右键出售 ${it.sellPrice??Math.floor(it.price*.7)} 金币</span>`));
     d.addEventListener('mouseleave',hideTip);
     box.appendChild(d);
   }
 }
-function nearShop(g){ return dist(g.player, FOUNTAIN_POS[g.playerTeam])<600; }
+function nearShop(g){ return g.training||dist(g.player, FOUNTAIN_POS[g.playerTeam])<600; }
 function buyItem(g,it){
   const p=g.player;
   if(!nearShop(g) && !p.dead){ announce(g,'离商店太远了',{small:true,color:'#e88'}); sfx('error'); return; }
-  if(p.items.length>=6){ announce(g,'装备栏已满',{small:true,color:'#e88'}); sfx('error'); return; }
-  if(it.boots && p.items.some(x=>x.boots)){ announce(g,'只能购买一双鞋子',{small:true,color:'#e88'}); sfx('error'); return; }
-  if(p.gold<it.price){ announce(g,'金币不足',{small:true,color:'#e88'}); sfx('error'); return; }
-  p.gold-=it.price; p.items.push(it); sfx('buy');
+  const error=purchaseItem(p,it);if(error){announce(g,error,{small:true,color:'#e88'});sfx('error');return;}sfx('buy');
 }
 function sellItem(g,slot){
   const p=g.player, it=p.items[slot];
   if(!it) return;
   if(!nearShop(g) && !p.dead){ announce(g,'离商店太远了',{small:true,color:'#e88'}); return; }
-  p.items.splice(slot,1); p.gold+=Math.floor(it.price*0.7); sfx('gold');
+  p.items.splice(slot,1); p.gold+=it.sellPrice??Math.floor(it.price*0.7); sfx('gold');
 }
 function toggleShop(g,force){
   shopOpen = force!==undefined? force : !shopOpen;
   $('#shop').style.display=shopOpen?'flex':'none';
+  $('#shop-hint').textContent='左键购买，组件自动抵扣 · 装备栏右键出售 · '+(g.training?'训练模式可随处购物':'需在泉水附近购买');
   $('#shop-gold').textContent=Math.floor(g.player.gold);
 }
 
@@ -265,7 +274,7 @@ function renderScoreboard(g){
         <td>${c.kills}/${c.deaths}/${c.assists}</td>
         <td>${c.cs}</td>
         <td class="sb-gold">${Math.floor(c.gold+c.items.reduce((s,i)=>s+i.price,0))}</td>
-        <td class="sb-items">${c.items.map(i=>`<span title="${i.name}">${i.icon}</span>`).join('')}</td>
+        <td class="sb-items">${c.items.map(i=>`<span title="${i.name}">${iconHTML(i)}</span>`).join('')}</td>
       </tr>`).join('');
     return `<table class="sb-table"><thead><tr><th></th><th>英雄</th><th>K/D/A</th><th>补刀</th><th>经济</th><th>装备</th></tr></thead><tbody>${rows}</tbody></table>`;
   };

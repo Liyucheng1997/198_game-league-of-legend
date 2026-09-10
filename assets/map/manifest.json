@@ -1,0 +1,39 @@
+{
+  "repository": "https://github.com/FrankTheBoxMonster/LoL-NGRID-converter",
+  "commit": "92943ed2b2d5e82c86d680e69f53f247c89aefee",
+  "season": 2024,
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/FrankTheBoxMonster/LoL-NGRID-converter/92943ed2b2d5e82c86d680e69f53f247c89aefee/SR_2024/renders/Base.png",
+      "file": "assets/map/source/Base.png",
+      "bytes": 85800165,
+      "sha256": "d5632c8e7193cd0b44204daf858dd846721e1efc2b94ffea0547eda43fd3b5fc"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/FrankTheBoxMonster/LoL-NGRID-converter/92943ed2b2d5e82c86d680e69f53f247c89aefee/SR_2024/navgrids/Base/AIPath_SRX_3.VisionPathing.bmp",
+      "file": "assets/map/source/VisionPathing.bmp",
+      "bytes": 262902,
+      "sha256": "9f62425d35442995dd0a3e514a538dd7ee2fac52aa3bde723a07e3fe0ba9fb04"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/FrankTheBoxMonster/LoL-NGRID-converter/92943ed2b2d5e82c86d680e69f53f247c89aefee/SR_2024/navgrids/Base/AIPath_SRX_3.LSGNGRID",
+      "file": "assets/map/source/Base.LSGNGRID",
+      "bytes": 1925836,
+      "sha256": "02398a225fe77ef37fb874ed972715ab904a0b87cbc90c556bd852e559d734da"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/FrankTheBoxMonster/LoL-NGRID-converter/92943ed2b2d5e82c86d680e69f53f247c89aefee/LICENSE",
+      "file": "assets/map/SOURCE-LICENSE.txt",
+      "bytes": 34502,
+      "sha256": "c685f13bb6c29676960eed800eebbb57b56811cf18ebc734275fb3692e69b39e"
+    }
+  ],
+  "renderSize": [
+    8192,
+    8192
+  ],
+  "gridSize": [
+    295,
+    296
+  ]
+}

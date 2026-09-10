@@ -20,10 +20,11 @@ class Unit {
     Object.assign(this,o);
   }
   hasBuff(id){ return this.buffs.some(b=>b.id===id); }
-  isStunned(){ return this.buffs.some(b=>b.stun); }
+  isStunned(){ return !(this.unstoppableUntil>gameRef?.t) && this.buffs.some(b=>b.stun); }
+  isSilenced(){ return this.buffs.some(b=>b.silence); }
   isRooted(){ return this.buffs.some(b=>b.stun||b.root); }
   buffStat(k){ let v=0; for(const b of this.buffs) if(b.stats&&b.stats[k]) v+=b.stats[k]; return v; }
-  slowPct(){ let v=0; for(const b of this.buffs) if(b.slow) v=Math.max(v,b.slow); return v; }
+  slowPct(){ if(this.buffs.some(b=>b.slowImmune)) return 0; let v=0; for(const b of this.buffs) if(b.slow) v=Math.max(v,b.slow); return v; }
   drPct(){ let v=0; for(const b of this.buffs) if(b.stats&&b.stats.dr) v=Math.max(v,b.stats.dr); return v; }
   shieldTotal(){ return this.shields.reduce((s,x)=>s+x.amt,0); }
   visibleTo(team){ return team===TEAM_BLUE? this.visBlue : this.visRed; }
@@ -31,8 +32,11 @@ class Unit {
 
 function addBuff(u, b){
   if(u.dead) return;
+  if((b.stun||b.root||b.charm)&&u.unstoppableUntil>gameRef.t)return;
+  if(b.stun||b.charm||b.silence)u.buffs=u.buffs.filter(x=>!x.channel);
   b.until = (b.until!==undefined)? b.until : null; // set in tick using dur
   b._expire = gameRef.t + b.dur;
+  if((b.stun||b.root||b.slow||b.silence||b.charm)&&b.id!=='airborne'&&u.itemStat)b._expire=gameRef.t+b.dur*(1-Math.min(80,u.itemStat('tenacity'))/100);
   b._lastTick = gameRef.t;
   // 同 id 刷新
   const i = u.buffs.findIndex(x=>x.id===b.id);
@@ -61,10 +65,12 @@ function enemiesIn(g, team, x, y, r){
 function effArmor(u,type){ return type==='phys'? (u.stat? u.stat('armor'):u.armor||0) : type==='magic'? (u.stat? u.stat('mr'):u.mr||0) : 0; }
 
 function dealDamage(g, src, tgt, amt, type){
-  if(!tgt || tgt.dead || tgt.invulnerable || amt<=0) return 0;
-  const def = Math.max(0, effArmor(tgt,type));
-  let dmg = amt * 100/(100+def);
-  dmg *= (1 - (tgt.drPct? tgt.drPct():0)/100);
+  if(!tgt || tgt.dead || tgt.invulnerable || tgt.attackable===false || amt<=0) return 0;
+  let def = effArmor(tgt,type);
+  if(type==='phys'&&src?.def?.id==='darius')def*=1-.05*(src.abilities[2].lvl||0);
+  if(type==='magic'&&src?.itemStat&&def>0)def=Math.max(0,def-src.itemStat('magicPen'));
+  let dmg = type==='true'?amt:amt*(def>=0?100/(100+def):2-100/(100-def));
+  if(type!=='true')dmg *= (1 - (tgt.drPct? tgt.drPct():0)/100);
   // 护盾吸收
   for(const s of tgt.shields){
     if(dmg<=0) break;
@@ -74,7 +80,8 @@ function dealDamage(g, src, tgt, amt, type){
   if(dmg>0) tgt.hp -= dmg;
   tgt.lastDmgAt = g.t;
   if(src){
-    src.lastDmgAt = g.t; // 双方进入战斗状态
+    if(src.type==='champ') src.lastAttackAt=g.t;
+    if(src.type==='champ'||src.type==='monster')tgt.lastHostileDmgAt=g.t;
     // 打断回城
     if(tgt.order && tgt.order.type==='recall'){ tgt.order={type:'hold'}; if(tgt===g.player) announce(g,'回城被打断',{small:true,color:'#e88'}); }
     // 冥想等引导不被打断（仅回城打断）
@@ -88,6 +95,7 @@ function dealDamage(g, src, tgt, amt, type){
     if(tgt.type==='monster' && !tgt.atkTarget) tgt.atkTarget=champSrc||src;
   }
   if(tgt.hp<=0) killUnit(g, src, tgt);
+  if(g.damageNumbers&&dmg>0)addEffect(g,{kind:'damage',x:tgt.x,y:tgt.y-40,amount:Math.round(dmg),color:type==='true'?'#fff':type==='magic'?'#b49fff':'#ffca85',dur:.8});
   return dmg;
 }
 
@@ -102,10 +110,11 @@ function killUnit(g, src, u){
   if(u.dead) return;
   u.dead=true; u.hp=0; u.buffs=[]; u.shields=[];
   const killer = champKiller(src);
+  if(typeof championTakedown==='function')championTakedown(g,killer,u);
   if(u.type==='minion' || u.type==='monster'){
     // 经验分享
     const xpTeam = enemyTeam(u.team||'neutral')||null;
-    const gainers = g.champs.filter(c=>!c.dead && (u.team? c.team!==u.team : true) && dist(c,u)<CFG.xpRadius);
+    const gainers = g.champs.filter(c=>!c.dead && (u.team? c.team!==u.team : c.team===killer?.team) && dist(c,u)<CFG.xpRadius);
     for(const c of gainers) giveXP(g,c, u.xp/Math.max(1,gainers.length) * (gainers.length>1?1.3:1));
     if(killer && (!u.team || killer.team!==u.team)){ killer.gold+=u.gold; if(u.type==='minion') killer.cs++; }
     if(u.type==='monster') monsterKilled(g, killer, u);
@@ -127,7 +136,7 @@ function giveXP(g, c, xp){
   c.xp += xp;
   while(c.level<18 && c.xp >= xpToLevel(c.level)){
     c.xp -= xpToLevel(c.level); c.level++; c.skillPoints++;
-    c.hp += c.def.base.hpG;  // 升级回复成长部分
+    // updateChamp applies the increased maximum once (avoid double healing).
     addEffect(g,{kind:'levelup',x:c.x,y:c.y,dur:1.2,color:'#ffd75e',unit:c});
     if(c===g.player){ sfx('levelup'); }
     if(c.isBot) botAutoSkill(c);
@@ -185,7 +194,7 @@ function monsterKilled(g, killer, u){
     g.dragonStacks[team]++;
     for(const c of g.champs) if(c.team===team){ c.gold+=120; }
     announce(g,(team===g.playerTeam?'我方':'敌方')+'击杀了小龙',{color:'#ffb84d',speech:true});
-  } else {
+  } else if(u.kind==='baron') {
     for(const c of g.champs) if(c.team===team){ c.gold+=300;
       addBuff(c,{id:'baron',dur:180,stats:{ad:40,ap:60}, fx:'#c8a0ff'}); }
     announce(g,(team===g.playerTeam?'我方':'敌方')+'击杀了纳什男爵',{color:'#c86bff',speech:(team===g.playerTeam?'我方团队击杀了男爵':'敌方团队击杀了男爵')});
@@ -201,19 +210,22 @@ function updateProjectiles(g,dt){
     if(p.deadP) continue;
     if(p.target){ // 跟踪弹
       const t=p.target;
-      if(t.dead){ p.deadP=true; continue; }
+      if(t.dead||t.untargetable){ p.deadP=true; continue; }
       const d=dist(p,t), step=p.speed*dt;
+      if(p.intercept){const nx=p.x+(t.x-p.x)/(d||1)*Math.min(step,d),ny=p.y+(t.y-p.y)/(d||1)*Math.min(step,d);const block=g.champs.find(u=>u!==t&&!u.dead&&!u.untargetable&&u.team!==p.team&&distToSeg(u.x,u.y,p.x,p.y,nx,ny)<u.radius+p.r);if(block){p.deadP=true;p.onHit(g,block,p);continue;}}
       if(d<=step+t.radius){ p.deadP=true; p.onHit&&p.onHit(g,t,p); }
       else { p.x+=(t.x-p.x)/d*step; p.y+=(t.y-p.y)/d*step; }
-    } else { // 直线弹
+    } else { // 直线弹 / 回旋弹
+      if(p.returnTo){if(p.returnTo.dead||dist(p,p.returnTo)<p.speed*dt){p.deadP=true;continue;}p.dir=Math.atan2(p.returnTo.y-p.y,p.returnTo.x-p.x);}
       const step=p.speed*dt;
       const nx=p.x+Math.cos(p.dir)*step, ny=p.y+Math.sin(p.dir)*step;
       // 碰撞检测
-      for(const u of g.units()){
+      const hitOrder=g.units().filter(u=>!u.dead&&!u.untargetable&&distToSeg(u.x,u.y,p.x,p.y,nx,ny)<p.r+u.radius).sort((a,b)=>((a.x-p.x)*(nx-p.x)+(a.y-p.y)*(ny-p.y))-((b.x-p.x)*(nx-p.x)+(b.y-p.y)*(ny-p.y)));
+      for(const u of hitOrder){
         if(p.deadP) break;
         if(u.dead||u.untargetable) continue;
         if(u.type==='tower'||u.type==='inhib'||u.type==='nexus') continue;
-        const hostile = u.type==='monster' ? false : u.team!==p.team;
+        const hostile = u.type==='monster' ? !p.champOnly : u.team!==p.team;
         if(!hostile) continue;
         if(p.champOnly && u.type!=='champ') continue;
         if(p.hitSet && p.hitSet.has(u.id)) continue;
@@ -224,7 +236,7 @@ function updateProjectiles(g,dt){
         }
       }
       p.x=nx; p.y=ny; p.travelled+=step;
-      if(p.travelled>(p.maxDist||900) || p.x<0||p.y<0||p.x>WORLD||p.y>WORLD) p.deadP=true;
+      if(p.travelled>(p.maxDist||(p.returnTo?15000:900)) || p.x<0||p.y<0||p.x>WORLD||p.y>WORLD) p.deadP=true;
     }
   }
   g.projectiles = g.projectiles.filter(p=>!p.deadP);
@@ -232,6 +244,7 @@ function updateProjectiles(g,dt){
 
 /* ---------- 普攻 ---------- */
 function doAutoAttack(g, u, t){
+  if(u.buffs?.some(b=>b.disarm)||u.untargetable)return;
   u.faceAngle = Math.atan2(t.y-u.y, t.x-u.x);
   if(u.type==='champ') setHeroAnim(g,u,'attack',0.34,u.faceAngle);
   const fire = (victim)=>{
@@ -239,9 +252,14 @@ function doAutoAttack(g, u, t){
     let critted=false;
     if(u.stat && Math.random()*100 < u.stat('crit')){ dmg*=1.75; critted=true; }
     let bonus=0, bonusType=null;
-    if(u.empowerAA && g.t<u.empowerAA.until){ bonus=u.empowerAA.dmg; bonusType=u.empowerAA.type; u.empowerAA=null; }
+    const empower=u.empowerAA&&g.t<u.empowerAA.until?u.empowerAA:null;
+    if(empower){ bonus=empower.dmg; bonusType=empower.type; u.empowerAA=null; }
     const dealt = dealDamage(g,u,victim,dmg,'phys');
     if(bonus) dealDamage(g,u,victim,bonus,bonusType||'phys');
+    if(empower?.silence)addBuff(victim,{id:'empowerSilence',dur:empower.silence,silence:true,fx:'#e6d48e'});
+    if(empower?.slow)addBuff(victim,{id:'empowerSlow',dur:1,slow:empower.slow});
+    if(empower?.refund&&victim.dead){u.mp=Math.min(u.maxMp,u.mp+40);u.abilities[1].readyAt=g.t+1;}
+    if(u.hasBuff('redBuff')){dealDamage(g,u,victim,5+u.level*2,'true');addBuff(victim,{id:'redSlow',dur:2,slow:u.ranged?10:20});}
     // 真伤 on-hit（剑圣E）
     const tb=u.buffs&&u.buffs.find(b=>b.trueOnHit);
     if(tb) dealDamage(g,u,victim,tb.trueOnHit,'true');
@@ -275,6 +293,7 @@ function moveAndAttack(g, u, t, dt){
 }
 function unitMS(u){ return u.stat? u.stat('ms') : u.ms*(1-u.slowPct()/100); }
 function stepToward(u, x, y, step){
+  if(gameRef?.nav)return navigateStep(u,x,y,step);
   const d=Math.hypot(x-u.x,y-u.y); if(d<1) return true;
   const s=Math.min(step,d);
   u.x=clampW(u.x+(x-u.x)/d*s); u.y=clampW(u.y+(y-u.y)/d*s);
@@ -291,7 +310,7 @@ class Champion extends Unit {
     this.kills=0; this.deaths=0; this.assists=0; this.cs=0;
     this.gold=CFG.startGold; this.items=[]; this.streak=0;
     this.ranged=def.ranged; this.projSpeed=def.projSpeed;
-    this.abilities = def.abilities.map(a=>({def:a, lvl:0, readyAt:0}));
+    this.abilities = def.abilities.map(a=>({def:a, lvl:0, readyAt:0,charges:a.maxCharges||0,rechargeAt:0}));
     this.summs = [{def:SUMMONER_SPELLS.flash, readyAt:0},{def:SUMMONER_SPELLS.heal, readyAt:0}];
     this.maxHp=this.stat('maxHp'); this.hp=this.maxHp;
     this.maxMp=this.stat('maxMp'); this.mp=this.maxMp;
@@ -303,17 +322,17 @@ class Champion extends Unit {
     const b=this.def.base, lv=this.level-1;
     switch(k){
       case 'ad':    return b.ad + b.adG*lv + this.itemStat('ad') + this.buffStat('ad');
-      case 'ap':    { let ap=this.itemStat('ap')+this.buffStat('ap'); if(this.items.some(i=>i.passive==='rabadon')) ap*=1.35; return ap; }
+      case 'ap':    { let ap=this.itemStat('ap')+this.buffStat('ap'); if(this.items.some(i=>i.passive==='rabadon')) ap*=1.30; return ap; }
       case 'maxHp': return b.hp + b.hpG*lv + this.itemStat('hp');
       case 'maxMp': return b.mp + b.mpG*lv + this.itemStat('mp');
-      case 'armor': return b.armor + b.armG*lv + this.itemStat('armor') + this.buffStat('armor');
+      case 'armor': return (b.armor + b.armG*lv + this.itemStat('armor') + this.buffStat('armor'))*(1+this.buffStat('armorPct')/100);
       case 'mr':    return b.mr + b.mrG*lv + this.itemStat('mr') + this.buffStat('mr');
       case 'as':    return Math.min(2.5, b.as*(1+(b.asG*lv + this.itemStat('as') + this.buffStat('as'))/100));
-      case 'ms':    { let v=(b.ms + this.itemStat('ms'))*(1+this.buffStat('msPct')/100)*(1-this.slowPct()/100); return Math.max(60,v); }
+      case 'ms':    { let v=(b.ms + this.itemStat('ms'))*(1+(this.itemStat('msPct')+this.buffStat('msPct'))/100)*(1-this.slowPct()/100); return Math.max(60,v); }
       case 'crit':  return this.itemStat('crit');
       case 'ls':    return this.itemStat('ls');
-      case 'cdr':   return Math.min(40, this.itemStat('cdr'));
-      case 'hp5':   return b.hp5 + this.itemStat('hp5');
+      case 'cdr':   return 100-10000/(100+this.itemStat('haste'));
+      case 'hp5':   return b.hp5*(1+this.itemStat('hpRegenPct')/100) + this.itemStat('hp5');
       case 'mp5':   return b.mp5 + this.itemStat('mp5');
       case 'range': return this.def.range;
     }
@@ -328,15 +347,23 @@ class Champion extends Unit {
   levelUp(i){ if(this.canLevel(i)){ this.abilities[i].lvl++; this.skillPoints--; return true; } return false; }
   abilityReady(i){
     const a=this.abilities[i];
-    return a.lvl>0 && gameRef.t>=a.readyAt && this.mp>=lvlv(a.def.mana,a.lvl) && !this.dead && !this.isStunned() && !this.hasBuff('luxRcast');
+    const recast=a.def.recastWhen?.(gameRef,this);
+    const cooled=!!recast||(a.def.maxCharges?a.charges>0:gameRef.t>=a.readyAt);
+    return a.lvl>0 && cooled && (recast||this.mp>=lvlv(a.def.mana,a.lvl)) && !this.dead && !this.isStunned() && !this.isSilenced() && !this.untargetable && !this.hasBuff('luxRcast') && !this.hasBuff('caitQcast') && (!a.def.canCast||a.def.canCast(gameRef,this));
   }
   castAbility(g, i, aim){
-    if(!this.abilityReady(i)) return false;
+    if(g.paused||g.over||!this.abilityReady(i)) return false;
     const a=this.abilities[i], def=a.def;
+    const recast=!!def.recastWhen?.(g,this);
+    aim=aim||{x:this.x,y:this.y};
     // 目标类校验
     if(def.aim==='unit'){
-      if(!aim.unit || aim.unit.dead || aim.unit.team===this.team) return false;
+      if(!aim.unit || aim.unit.dead || aim.unit.untargetable || ['tower','inhib','nexus'].includes(aim.unit.type) || aim.unit.team===this.team || (def.champOnly&&aim.unit.type!=='champ') || (aim.unit.team&&!aim.unit.visibleTo(this.team))) return false;
       if(dist(this,aim.unit)>def.range+aim.unit.radius) return false;
+    }
+    if(def.aim==='ally'){
+      if(!aim.unit&&def.allowSelf)aim={x:this.x,y:this.y,unit:this};
+      if(!aim.unit||aim.unit.dead||aim.unit.team!==this.team||aim.unit.type!=='champ'||(!def.allowSelf&&aim.unit===this)||dist(this,aim.unit)>def.range+aim.unit.radius)return false;
     }
     if(def.aim==='pos' && def.range<9000){
       const d=dist(this,aim); if(d>def.range){ const a2=Math.atan2(aim.y-this.y,aim.x-this.x);
@@ -344,19 +371,25 @@ class Champion extends Unit {
     }
     // 打断引导（冥想）
     this.buffs=this.buffs.filter(b=>!b.channel);
-    def._l = (c)=>a.lvl;
+    def._l = (c)=>c.abilities[i].lvl;
     const ok = def.cast(g,this,aim);
     if(ok===false) return false;
-    a.readyAt = g.t + lvlv(def.cd,a.lvl)*(1-this.stat('cdr')/100);
-    this.mp -= lvlv(def.mana,a.lvl);
-    this.lastDmgAt=g.t;
+    if(!recast){
+      a.readyAt = g.t + lvlv(def.cd,a.lvl)*(1-this.stat('cdr')/100);
+      if(def.maxCharges){if(a.charges===def.maxCharges)a.rechargeAt=a.readyAt;a.charges--;}
+      this.mp = Math.max(0,this.mp-lvlv(def.mana,a.lvl));
+    }
+    if(this.order.type==='recall')this.order={type:'hold'};
+    const facing=aim.unit||aim;const angle=Number.isFinite(facing.x)&&Number.isFinite(facing.y)?Math.atan2(facing.y-this.y,facing.x-this.x):this.faceAngle;
+    this.faceAngle=angle;if(this.heroAnim?.start!==g.t)setHeroAnim(g,this,def.key.toLowerCase(),.5,angle);
     if(this.visBlue) sfx('spell');
     return true;
   }
   castSumm(g, i, aim){
     const s=this.summs[i];
-    if(g.t<s.readyAt || this.dead || this.isStunned()) return false;
-    s.def.cast(g,this,aim||{x:this.x,y:this.y});
+    if(g.paused||g.over||g.t<s.readyAt || this.dead || this.isStunned()||this.untargetable) return false;
+    if(s.def.cast(g,this,aim||{x:this.x,y:this.y})===false)return false;
+    if(this.order.type==='recall')this.order={type:'hold'};
     s.readyAt=g.t+s.def.cd;
     return true;
   }
@@ -374,6 +407,7 @@ class Minion extends Unit {
       range:c.range, ms:c.ms, as:0.75, gold:Math.round(c.gold*(scale>1.3?1.3:scale)), xp:c.xp,
       ranged:c.range>100, projSpeed:c.projSpeed, wpIdx:1, path});
     this.name = {melee:'近战兵', caster:'法师兵', cannon:'炮车', super:'超级兵'}[kind];
+    if(typeof terrainLanding==='function')Object.assign(this,terrainLanding(this,this,true));
     if(kind==='super'){ this.armor=30; this.mr=30; }
   }
   update(g,dt){
@@ -406,7 +440,7 @@ class Minion extends Unit {
 class Tower extends Unit {
   constructor(def, team){
     super({type:'tower', team, lane:def.lane, tier:def.tier,
-      x: team===TEAM_BLUE? def.x : WORLD-def.x, y: team===TEAM_BLUE? def.y : WORLD-def.y,
+      x: team===TEAM_BLUE? def.x : (def.rx??WORLD-def.x), y: team===TEAM_BLUE? def.y : (def.ry??WORLD-def.y),
       radius:CFG.towerRadius, maxHp:CFG.towerHp[def.tier], hp:CFG.towerHp[def.tier],
       armor:55, mr:55, range:CFG.towerRange, as:0.8, ad:CFG.towerAd, heat:0});
     this.name='防御塔';
@@ -461,7 +495,7 @@ class Building extends Unit {
       return !t3 || t3.dead;
     }
     // 枢纽：两座门牙塔均被摧毁
-    return g.towers.filter(t=>t.team===this.team&&t.tier===4).every(t=>t.dead);
+    return g.inhibs.some(i=>i.team===this.team&&i.dead)&&g.towers.filter(t=>t.team===this.team&&t.tier===4).every(t=>t.dead);
   }
 }
 
@@ -492,11 +526,13 @@ class Monster extends Unit {
 let gameRef=null;
 
 class Game {
-  constructor(playerChampId){
+  constructor(playerChampId,options={}){
     gameRef=this;
     this.t=0; this.paused=false; this.over=null; this.firstBlood=false;
     this.playerTeam=TEAM_BLUE;
     this.effects=[]; this.projectiles=[]; this.zones=[]; this.delayed=[];
+    this.options=options;this.pets=[];this.wards=[];this.damageNumbers=true;
+    if(typeof RiftNavigation!=='undefined')this.nav=new RiftNavigation();
     this.revealUntil={blue:0, red:0};
     this.dragonStacks={blue:0, red:0};
     this.waveNum=0; this.nextWaveAt=CFG.firstWave;
@@ -508,7 +544,7 @@ class Game {
     for(const team of [TEAM_BLUE,TEAM_RED]){
       for(const d of TOWER_DEFS_BLUE) this.towers.push(new Tower(d,team));
       for(const d of INHIB_DEFS_BLUE){
-        const p = team===TEAM_BLUE? d : reflect(d);
+        const p = team===TEAM_BLUE? d : {x:d.rx??WORLD-d.x,y:d.ry??WORLD-d.y};
         this.inhibs.push(new Building('inhib',team,p,CFG.inhibHp,26,d.lane));
       }
       this.nexuses.push(new Building('nexus',team,NEXUS_POS[team],CFG.nexusHp,46));
@@ -518,11 +554,12 @@ class Game {
 
     // 英雄阵容
     const others = CHAMPIONS.filter(c=>c.id!==playerChampId);
-    const shuffled = others.slice().sort(()=>Math.random()-0.5).slice(0,4);
-    const enemyPicks = CHAMPIONS.slice().sort(()=>Math.random()-0.5).slice(0,5);
+    const shuffled = others.slice(0,4);
+    const enemyPicks = others.slice(4,9);
+    while(enemyPicks.length<5)enemyPicks.push(CHAMPIONS[enemyPicks.length%CHAMPIONS.length]);
     this.champs=[];
     // 玩家：中路
-    this.player = new Champion(CHAMP_BY_ID[playerChampId], TEAM_BLUE, {displayName:'你', lane:'mid'});
+    this.player = new Champion(CHAMP_BY_ID[playerChampId], TEAM_BLUE, {displayName:CHAMP_BY_ID[playerChampId].name, lane:options.lane||'mid'});
     this.champs.push(this.player);
     const allyLanes=['top','bot','bot','mid'];
     shuffled.forEach((def,i)=>{
@@ -541,18 +578,20 @@ class Game {
       c.x=clampW(c.x); c.y=clampW(c.y);
       if(c.isBot) botAutoSkill(c);
     }
+    if(typeof setupRiftGame==='function')setupRiftGame(this,options);
   }
   units(){ // 所有可交互单位
     if(this._unitsCacheT===this.t && this._unitsCache) return this._unitsCache;
-    this._unitsCache=[...this.champs, ...this.minions, ...this.towers, ...this.inhibs, ...this.nexuses, ...this.monsters];
+    this._unitsCache=[...this.champs, ...this.minions, ...this.pets, ...this.towers, ...this.inhibs, ...this.nexuses, ...this.monsters];
     this._unitsCacheT=this.t;
     return this._unitsCache;
   }
   teamKills(team){ return this.champs.filter(c=>c.team===team).reduce((s,c)=>s+c.kills,0); }
 
   update(dt){
-    if(this.over) return;
+    if(this.over||this.paused) return;
     this.t+=dt;
+    if(typeof updateRiftSystems==='function')updateRiftSystems(this,dt);
     // 延迟回调
     for(const d of this.delayed) if(this.t>=d.t && !d.done){ d.done=true; d.fn(); }
     this.delayed=this.delayed.filter(d=>!d.done);
@@ -584,6 +623,8 @@ class Game {
     for(const m of this.minions) if(!m.dead) m.update(this,dt);
     for(const t of this.towers) if(!t.dead) t.update(this,dt);
     for(const m of this.monsters) if(!m.dead) m.update(this,dt);
+    for(const p of this.pets)if(!p.dead)p.update(this,dt);
+    this.pets=this.pets.filter(p=>!p.dead);
     updateProjectiles(this,dt);
     // 小兵分离（防止重叠成一点）
     this.separateMinions();
@@ -624,12 +665,15 @@ class Game {
     c.hp=Math.min(mh, c.hp + c.stat('hp5')/5*dt);
     c.mp=Math.min(mm, c.mp + c.stat('mp5')/5*dt);
     // 盖伦被动：脱战回复
-    if(c.def.id==='garen' && this.t-c.lastDmgAt>7) healUnit(c, mh*0.015*dt);
+    if(c.def.id==='garen' && this.t-(c.lastHostileDmgAt??-99)>8) healUnit(c, mh*(.003+.0007*c.level)*dt);
     // 泉水
     const f=FOUNTAIN_POS[c.team];
     if(dist(c,f)<400){ c.hp=Math.min(mh,c.hp+mh*0.09*dt); c.mp=Math.min(mm,c.mp+mm*0.12*dt); }
     // 被动金币
-    if(this.t>30) c.gold += CFG.passiveGoldPerSec*dt;
+    if(this.t>110) c.gold += CFG.passiveGoldPerSec*dt;
+    const charm=c.buffs.find(b=>b.charm);
+    if(charm){stepToward(c,charm.charm.x,charm.charm.y,c.stat('ms')*dt);return;}
+    if(c.isStunned())return;
     // AI
     if(c.isBot) botThink(this,c,dt);
     // 眩晕
@@ -690,12 +734,16 @@ class Game {
         const b=ms[j]; if(b.dead) continue;
         const dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy), min=a.radius+b.radius;
         if(d<min&&d>0.01){ const push=(min-d)/2/d;
-          a.x-=dx*push*0.5; a.y-=dy*push*0.5; b.x+=dx*push*0.5; b.y+=dy*push*0.5; }
+          const ax=a.x-dx*push*.5,ay=a.y-dy*push*.5,bx=b.x+dx*push*.5,by=b.y+dy*push*.5;
+          if(typeof mapWalkable!=='function'||mapWalkable(ax,ay,a.radius)){a.x=ax;a.y=ay;}
+          if(typeof mapWalkable!=='function'||mapWalkable(bx,by,b.radius)){b.x=bx;b.y=by;}
+        }
       }
     }
   }
 
   computeVision(){
+    if(typeof computeRiftVision==='function'){computeRiftVision(this);return;}
     for(const team of [TEAM_BLUE,TEAM_RED]){
       const key = team===TEAM_BLUE?'visBlue':'visRed';
       const revealed = this.t < this.revealUntil[team];
@@ -739,10 +787,23 @@ function botAutoSkill(c){
   }
 }
 
+function itemPurchaseQuote(c,it){
+  const consumed=[];
+  const visit=id=>{const index=c.items.findIndex((owned,i)=>owned.riotId===id&&!consumed.includes(i));if(index>=0){consumed.push(index);return;}const component=typeof RIOT_DATA!=='undefined'?RIOT_DATA.items[id]:null;for(const child of component?.from||(typeof RIOT_DATA!=='undefined'?RIOT_DATA.recipes?.[id]:null)||[])visit(Number(child));};
+  for(const id of it.components||[])visit(id);
+  // All upgrade boots include basic boots in their recipe; only represented
+  // components are discounted, keeping the purchase atomic at six slots.
+  if(it.boots&&it.id!=='boots'){const i=c.items.findIndex(x=>x.id==='boots');if(i>=0&&!consumed.includes(i))consumed.push(i);}
+  const remaining=c.items.filter((_,i)=>!consumed.includes(i));
+  const price=it.price-consumed.reduce((sum,i)=>sum+c.items[i].price,0);
+  const error=it.boots&&remaining.some(x=>x.boots)?'只能装备一双鞋子':remaining.length>=6?'装备栏已满':c.gold<price?'金币不足':null;
+  return {price:Math.max(0,price),consumed,remaining,error};
+}
+function purchaseItem(c,it){const quote=itemPurchaseQuote(c,it);if(quote.error)return quote.error;c.gold-=quote.price;c.items=[...quote.remaining,it];return null;}
 function botShopping(g,c){
   while(c.buildIdx<c.def.build.length){
     const it=ITEM_BY_ID[c.def.build[c.buildIdx]];
-    if(c.gold>=it.price && c.items.length<6){ c.gold-=it.price; c.items.push(it); c.buildIdx++; }
+    if(!purchaseItem(c,it)){c.buildIdx++;}
     else break;
   }
 }

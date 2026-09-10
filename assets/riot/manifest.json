@@ -1,0 +1,683 @@
+{
+  "version": "14.24.1",
+  "sources": [
+    {
+      "path": "assets/riot/champions/Ahri.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Ahri.png",
+      "bytes": 28511,
+      "sha256": "8e93368d97e3d302463c4e83ac5980d1f0a3a0aaf92ac44435730fecbd55b565"
+    },
+    {
+      "path": "assets/riot/champions/Annie.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Annie.png",
+      "bytes": 30267,
+      "sha256": "97720fcc698033b18382e7475800d4aac6c436712d997d99df4a0ae99f6829e2"
+    },
+    {
+      "path": "assets/riot/champions/Ashe.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Ashe.png",
+      "bytes": 32121,
+      "sha256": "423666bdb0685355be4576f78eb6406fd49469b4f6e9f780f1c5eb4349fed91f"
+    },
+    {
+      "path": "assets/riot/champions/Caitlyn.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Caitlyn.png",
+      "bytes": 25976,
+      "sha256": "f7a515360f30f33dfe5ab4e8886ce59a70c2d333f924252f48f5f9a2fbc6edf4"
+    },
+    {
+      "path": "assets/riot/champions/Darius.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Darius.png",
+      "bytes": 27666,
+      "sha256": "4c73167413335e00b3ece58fadaa495a0c3fe05184b246b0f8b9af923a0d3d81"
+    },
+    {
+      "path": "assets/riot/champions/Garen.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Garen.png",
+      "bytes": 30705,
+      "sha256": "53018603962e1867b391071f159bb4c60d57919422585c33bfd36551e97f3752"
+    },
+    {
+      "path": "assets/riot/champions/Lux.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Lux.png",
+      "bytes": 29188,
+      "sha256": "64639bea2aa7d622dd07287de7a7820950e567f0993c7dcc422e1e699fd743fd"
+    },
+    {
+      "path": "assets/riot/champions/Malphite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Malphite.png",
+      "bytes": 26063,
+      "sha256": "233005b989ae25fc6e5e22d1325291bce2d64e49767ebb83413c0f91e1b157c6"
+    },
+    {
+      "path": "assets/riot/champions/MasterYi.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/MasterYi.png",
+      "bytes": 29421,
+      "sha256": "1c23534926a7956a260591fb3cee8f38cb6de3d9d4f064fe93fb88c8f76b1b66"
+    },
+    {
+      "path": "assets/riot/champions/Soraka.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Soraka.png",
+      "bytes": 31969,
+      "sha256": "ca2774023350198da7025b950c85be65e3506e2f40947ca4151f0e8df4a8be15"
+    },
+    {
+      "path": "assets/riot/data/Ahri.json",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/data/zh_CN/champion/Ahri.json",
+      "bytes": 9150,
+      "sha256": "f45f50079a66cfffc3a3b7bf345b13670b66a40f94ba855508f6ba1008933a13"
+    },
+    {
+      "path": "assets/riot/data/Annie.json",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/data/zh_CN/champion/Annie.json",
+      "bytes": 9846,
+      "sha256": "97ee387a7ee3b48fedd23874ecb5f88460d9c292eecad2c123b34ef59c2a43c0"
+    },
+    {
+      "path": "assets/riot/data/Ashe.json",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/data/zh_CN/champion/Ashe.json",
+      "bytes": 9339,
+      "sha256": "27818b76341d8d537bff28ce4911512648efb2f9523d40483ab5c076669eaac8"
+    },
+    {
+      "path": "assets/riot/data/Caitlyn.json",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/data/zh_CN/champion/Caitlyn.json",
+      "bytes": 9465,
+      "sha256": "6364669eb38b5f21d801037aac4cee52577be442ae0271661f06101f92997a9f"
+    },
+    {
+      "path": "assets/riot/data/Darius.json",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/data/zh_CN/champion/Darius.json",
+      "bytes": 9833,
+      "sha256": "e125552f4bab2975ea36b1fc87d4806eb629e46ab8c31a9c99ecdeb54ef2cdd5"
+    },
+    {
+      "path": "assets/riot/data/Garen.json",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/data/zh_CN/champion/Garen.json",
+      "bytes": 9100,
+      "sha256": "ef6a28c6935ee429d00f4d731b074edd00b10fdb57206c3aa5f06cae2ac18b2e"
+    },
+    {
+      "path": "assets/riot/data/Lux.json",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/data/zh_CN/champion/Lux.json",
+      "bytes": 9384,
+      "sha256": "28591a821ee9e24a5af7dfb541f4fdb767349e39ce1c882e5613435e741faa14"
+    },
+    {
+      "path": "assets/riot/data/Malphite.json",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/data/zh_CN/champion/Malphite.json",
+      "bytes": 9339,
+      "sha256": "9aeb5d75841d7ed05681340b3ffcc9fbec565a870c34abd017eae75baf976ab6"
+    },
+    {
+      "path": "assets/riot/data/MasterYi.json",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/data/zh_CN/champion/MasterYi.json",
+      "bytes": 9227,
+      "sha256": "abebf60b5b3c89656078cd3a8673aa5a3dc195dac0d8b82609922b274e6b5402"
+    },
+    {
+      "path": "assets/riot/data/Soraka.json",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/data/zh_CN/champion/Soraka.json",
+      "bytes": 9223,
+      "sha256": "7e5542a962925ef030d2aec8f8af5912236d0978d73cc548d62714b27abf7b23"
+    },
+    {
+      "path": "assets/riot/data/items.json",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/data/zh_CN/item.json",
+      "bytes": 477636,
+      "sha256": "3f7c6c0bfd6f8fbc97206e1cb2c93d1eb0d45ea485d7d24eb79a89526f602685"
+    },
+    {
+      "path": "assets/riot/items/1001.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/1001.png",
+      "bytes": 4537,
+      "sha256": "f2b2a8ba7ae715c8906d3037d38778aa545f3d0740091640484aa3d126396ad0"
+    },
+    {
+      "path": "assets/riot/items/1031.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/1031.png",
+      "bytes": 6332,
+      "sha256": "57cb7021e404edd06245d002a49abc61f827cbf006a1b35f2aa0fa32375c86c2"
+    },
+    {
+      "path": "assets/riot/items/1036.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/1036.png",
+      "bytes": 5334,
+      "sha256": "c57b71ae65b3b38241f8ed97fe6fb5ae78db5a82002be392d91ebb6f5ffde8af"
+    },
+    {
+      "path": "assets/riot/items/1038.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/1038.png",
+      "bytes": 4983,
+      "sha256": "521ede3bac2e64d7b4dc5cc047c57abd7d17bb6a59ff0f6f24a569e41ab0cfe8"
+    },
+    {
+      "path": "assets/riot/items/1043.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/1043.png",
+      "bytes": 5767,
+      "sha256": "14b0096f1ecda8179ad0b067afee0fa4a39d80e70df4798c3eb3943f62b17a5c"
+    },
+    {
+      "path": "assets/riot/items/1052.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/1052.png",
+      "bytes": 5490,
+      "sha256": "5b6d009e518f50c73db3b4a7442d3bff0928fb2ea527babd77140ce817562e8a"
+    },
+    {
+      "path": "assets/riot/items/1054.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/1054.png",
+      "bytes": 5557,
+      "sha256": "5d51b7a9f16ff15444a0a015338de0ef9acab353ed3034fdd65db637d2b22181"
+    },
+    {
+      "path": "assets/riot/items/1055.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/1055.png",
+      "bytes": 3864,
+      "sha256": "1893376ba2a9476444e44e2f73b534d24a90cd0b4b11bf2d81a591e8fd857758"
+    },
+    {
+      "path": "assets/riot/items/1056.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/1056.png",
+      "bytes": 5484,
+      "sha256": "87ec4b0882f82a656d0ba11bc22f9ff68d24a87bd055b50c337287f5e0fc4fd1"
+    },
+    {
+      "path": "assets/riot/items/1057.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/1057.png",
+      "bytes": 6307,
+      "sha256": "4b63c85bcdca48ed074d0411f5c83274fee3e81553946ae4f0a9f0eae0e4f3aa"
+    },
+    {
+      "path": "assets/riot/items/1058.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/1058.png",
+      "bytes": 5943,
+      "sha256": "8a942c70b61d633074a237f6858742585e35146a8f6618ae3d8e07c8091063f4"
+    },
+    {
+      "path": "assets/riot/items/3006.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3006.png",
+      "bytes": 6568,
+      "sha256": "81089b0f6e9514f812189ee9b664e44045933c812ef3a62c0732cc2655397264"
+    },
+    {
+      "path": "assets/riot/items/3020.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3020.png",
+      "bytes": 6091,
+      "sha256": "0204f61a81aa9c3ef318dd27ed272e8c83e12009ce37a23d7c6193f9d991261b"
+    },
+    {
+      "path": "assets/riot/items/3031.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3031.png",
+      "bytes": 7104,
+      "sha256": "39382e1bef39a48d14e6d37e52e9d02068df9153ca60c2bcca033dd276fae5df"
+    },
+    {
+      "path": "assets/riot/items/3047.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3047.png",
+      "bytes": 6073,
+      "sha256": "22bc8d6451e5a100d06dd80b1c97600e991db20a2f9fd1eb8da151afc23881a1"
+    },
+    {
+      "path": "assets/riot/items/3065.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3065.png",
+      "bytes": 7502,
+      "sha256": "2e42844fe60ba038f5a3402abb4d1e42578acb032ad934c6e5cf883a7df92421"
+    },
+    {
+      "path": "assets/riot/items/3071.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3071.png",
+      "bytes": 6213,
+      "sha256": "fcb008f805d2bfeb63b3ea183d833fd63c2ef13b04c9ae2d67bc6ddfa3e77989"
+    },
+    {
+      "path": "assets/riot/items/3072.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3072.png",
+      "bytes": 6532,
+      "sha256": "adcf226cf9ca11cf22c840d56e94a5a240212f4503fca8b90ad3463b87b28180"
+    },
+    {
+      "path": "assets/riot/items/3075.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3075.png",
+      "bytes": 7458,
+      "sha256": "a94887d0c8711631ef0257eff8afea080c92c0d3360e816282d7c4975df49e41"
+    },
+    {
+      "path": "assets/riot/items/3078.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3078.png",
+      "bytes": 6498,
+      "sha256": "532961a6899aad1d50f5a4b4432d208c9cc6cfff4a18a606cdb60db218f24ff0"
+    },
+    {
+      "path": "assets/riot/items/3083.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3083.png",
+      "bytes": 7150,
+      "sha256": "642f3290afef9f937ab0cab22e290661250e277f1f1491945ed54d58dabf5f19"
+    },
+    {
+      "path": "assets/riot/items/3087.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3087.png",
+      "bytes": 5724,
+      "sha256": "e8c9687a8ab8c29c8cbc7fc593334cc0df3f92aad85138a5ac821345e88d45e0"
+    },
+    {
+      "path": "assets/riot/items/3089.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3089.png",
+      "bytes": 6981,
+      "sha256": "ad77331bb9a325db9536f5614f3ca3516e24279406123f2892eb33ee419d369b"
+    },
+    {
+      "path": "assets/riot/items/3111.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3111.png",
+      "bytes": 6769,
+      "sha256": "ce2d494abe20df23461fad8509e4d260ffb5909f56f459610348bbc0bff8688a"
+    },
+    {
+      "path": "assets/riot/items/3116.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3116.png",
+      "bytes": 6788,
+      "sha256": "483193bf9a72fd12ca64c23f5bb15d3a676dcabc17791ba119c1a9305336304c"
+    },
+    {
+      "path": "assets/riot/items/3143.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3143.png",
+      "bytes": 6688,
+      "sha256": "27557f63894cae0d592781dcb962baf9e1bce490bbda25798b0019119ea460a3"
+    },
+    {
+      "path": "assets/riot/items/3157.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3157.png",
+      "bytes": 7290,
+      "sha256": "fc0908ad8621e96ad635b5bac67e09f663ec80735efd732b10f07d8c498443aa"
+    },
+    {
+      "path": "assets/riot/items/6655.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6655.png",
+      "bytes": 6685,
+      "sha256": "51ac67093a8b92dc4fa09f088522c044ddb5177168b3069ce62ad940d6c8231a"
+    },
+    {
+      "path": "assets/riot/map/map11.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/map/map11.png",
+      "bytes": 67366,
+      "sha256": "d5cdcf93ee285cb6887648468063105002d669f5e005a6691b763ade61fb74ce"
+    },
+    {
+      "path": "assets/riot/spells/Ahri_E.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/AhriE.png",
+      "bytes": 6464,
+      "sha256": "f17a5c92b47e07664b9248428e4ff577b4ece3ebc24cd166b0710457497788f5"
+    },
+    {
+      "path": "assets/riot/spells/Ahri_P.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/passive/Ahri_SoulEater2.png",
+      "bytes": 6119,
+      "sha256": "5f23ebc71c6812a02c601525a25e426ff14920eeb22763b0f9b1abc9e4a5a2d9"
+    },
+    {
+      "path": "assets/riot/spells/Ahri_Q.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/AhriQ.png",
+      "bytes": 5817,
+      "sha256": "d4007421a453486e00709d533c7777d7ea68a31f6c32cfe0a9704be4009fea40"
+    },
+    {
+      "path": "assets/riot/spells/Ahri_R.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/AhriR.png",
+      "bytes": 6639,
+      "sha256": "5c1095c39353b5f7af61b8c66d818b82bcdfcfbbddd3cadedc526e47fa8b42fe"
+    },
+    {
+      "path": "assets/riot/spells/Ahri_W.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/AhriW.png",
+      "bytes": 5854,
+      "sha256": "fb77f1efec029da75c3718399558cd8432507a08d5e264ea63827c8186139abf"
+    },
+    {
+      "path": "assets/riot/spells/Annie_E.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/AnnieE.png",
+      "bytes": 6674,
+      "sha256": "cf59314df90fee0237dd006f2a89b811b36acbce93de40466382b287d455def3"
+    },
+    {
+      "path": "assets/riot/spells/Annie_P.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/passive/Annie_Passive.png",
+      "bytes": 5744,
+      "sha256": "f0bd60db5fbcade387268538626bbc21f185714e707f19eaf44334195e99bcc1"
+    },
+    {
+      "path": "assets/riot/spells/Annie_Q.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/AnnieQ.png",
+      "bytes": 5062,
+      "sha256": "f45bc34137ab2bee08ca0362b21bf665c09aae0614741c4cb6f40c89e1668d9a"
+    },
+    {
+      "path": "assets/riot/spells/Annie_R.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/AnnieR.png",
+      "bytes": 6140,
+      "sha256": "609820533a2135f12f2038a31a66df4eff9fdb861ce06e2b25b8d92fa72df63e"
+    },
+    {
+      "path": "assets/riot/spells/Annie_W.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/AnnieW.png",
+      "bytes": 5291,
+      "sha256": "0ffedf98f614496b2d609829a8ea09cd6e4a70d343907b0bdfcd366e17e82451"
+    },
+    {
+      "path": "assets/riot/spells/Ashe_E.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/AsheSpiritOfTheHawk.png",
+      "bytes": 5806,
+      "sha256": "94e8e9dd059f9d8615d02da2d6d3430fa20afc938a4baba66a6cfc91d9646506"
+    },
+    {
+      "path": "assets/riot/spells/Ashe_P.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/passive/Ashe_P.png",
+      "bytes": 6172,
+      "sha256": "a7f3fb4c9750c5ea46330d16394a2001290e56b6d709f8bd033d4e8b59713bb3"
+    },
+    {
+      "path": "assets/riot/spells/Ashe_Q.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/AsheQ.png",
+      "bytes": 6683,
+      "sha256": "ceb72f8ca8ef01c5ea8249599f956c5f5fa7eb5a41e69b9bfb3b994ba1abd6b4"
+    },
+    {
+      "path": "assets/riot/spells/Ashe_R.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/EnchantedCrystalArrow.png",
+      "bytes": 6449,
+      "sha256": "c26d0583a45c36b3a18b118d92ae1ae3534dae529a052d7c1fa41a9ea613f038"
+    },
+    {
+      "path": "assets/riot/spells/Ashe_W.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/Volley.png",
+      "bytes": 6241,
+      "sha256": "30e0daa99574f031aec984ac0bf27c0283e24b59d923276af8e9cb0e30c59a95"
+    },
+    {
+      "path": "assets/riot/spells/Caitlyn_E.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/CaitlynE.png",
+      "bytes": 6246,
+      "sha256": "55c19ff9a6f43506398af9b12a10b2d208838e63ee55479d8a4880cb6f04ac9c"
+    },
+    {
+      "path": "assets/riot/spells/Caitlyn_P.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/passive/Caitlyn_Headshot.png",
+      "bytes": 6084,
+      "sha256": "a2d7a6a2d69d504f3e437c681ab64766742bec95d25f26267c0a4dca9bd8e30d"
+    },
+    {
+      "path": "assets/riot/spells/Caitlyn_Q.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/CaitlynQ.png",
+      "bytes": 6402,
+      "sha256": "73da31bff40a466ac1c4c509cb73423409198363232b8e03a3b4ada6eef7137e"
+    },
+    {
+      "path": "assets/riot/spells/Caitlyn_R.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/CaitlynR.png",
+      "bytes": 5882,
+      "sha256": "e1d7ce1c3581c46a828507e74624661b6d8ecaf7bceb112f02102e1273864a89"
+    },
+    {
+      "path": "assets/riot/spells/Caitlyn_W.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/CaitlynW.png",
+      "bytes": 6680,
+      "sha256": "b10f1c40d626530df0e037955be03bfd11091c3a184f6b8a5a9c15cf8267bf64"
+    },
+    {
+      "path": "assets/riot/spells/Darius_E.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/DariusAxeGrabCone.png",
+      "bytes": 6739,
+      "sha256": "75bfd7146784dd3747d599c77cc8207180aa14668c0bd54d83cfddfdedcb4b34"
+    },
+    {
+      "path": "assets/riot/spells/Darius_P.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/passive/Darius_Icon_Hemorrhage.png",
+      "bytes": 3617,
+      "sha256": "f46b5b48b1862578cb54e567a14058bba6b6450db9a4d793482812414d851f2e"
+    },
+    {
+      "path": "assets/riot/spells/Darius_Q.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/DariusCleave.png",
+      "bytes": 4978,
+      "sha256": "d11224d32fa1576cc9421a55f8c0eea0a854115f4ffd48a624204992143fe5eb"
+    },
+    {
+      "path": "assets/riot/spells/Darius_R.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/DariusExecute.png",
+      "bytes": 5705,
+      "sha256": "a21325711c3dcdd2ffc5551ddc6cfc80737abfcf0f9b1e6b0895b3aa483e0342"
+    },
+    {
+      "path": "assets/riot/spells/Darius_W.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/DariusNoxianTacticsONH.png",
+      "bytes": 7010,
+      "sha256": "028f0297bbb731f8c33fee8b5c3717dbbc16a4f9a6d1a677d14fca9de8d76462"
+    },
+    {
+      "path": "assets/riot/spells/Garen_E.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/GarenE.png",
+      "bytes": 6473,
+      "sha256": "87526f9005c608b7b776128fc4526b28f615b782c3429c3d6bc200209c25f2da"
+    },
+    {
+      "path": "assets/riot/spells/Garen_P.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/passive/Garen_Passive.png",
+      "bytes": 6098,
+      "sha256": "17eba35927ea5085b35fa3b359eb36b85aeb71db59d4d0bc96333f697a5b6d7e"
+    },
+    {
+      "path": "assets/riot/spells/Garen_Q.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/GarenQ.png",
+      "bytes": 6105,
+      "sha256": "5ba32b3c14ed850b447a6cb54cf243144823e1ac61cf071ed9920cd26700ff8d"
+    },
+    {
+      "path": "assets/riot/spells/Garen_R.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/GarenR.png",
+      "bytes": 5230,
+      "sha256": "82031c7b445c6bced255fcc91b9a8570a8215f96092c766cb1a0e519cac5e949"
+    },
+    {
+      "path": "assets/riot/spells/Garen_W.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/GarenW.png",
+      "bytes": 5947,
+      "sha256": "4b653d35ceedddc2fc715e934307114c567c92aebd5b34708bdc5c077ce410eb"
+    },
+    {
+      "path": "assets/riot/spells/Lux_E.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/LuxLightStrikeKugel.png",
+      "bytes": 6567,
+      "sha256": "c5900b892f0065d9b19ce4d584b7633c23235dbfd0bf55cb7444fe0162fa0138"
+    },
+    {
+      "path": "assets/riot/spells/Lux_P.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/passive/LuxIlluminatingFraulein.png",
+      "bytes": 5815,
+      "sha256": "2b4f421b424450afeca3757d86fbceed1c15a67960c5ccdddbf3341d71042b68"
+    },
+    {
+      "path": "assets/riot/spells/Lux_Q.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/LuxLightBinding.png",
+      "bytes": 6820,
+      "sha256": "06abdcb3edede637b6fd076e69381f2ff538a30c788c3ec857d4834742c2b424"
+    },
+    {
+      "path": "assets/riot/spells/Lux_R.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/LuxR.png",
+      "bytes": 5520,
+      "sha256": "392a1ed2da41f165ae79c2c3e00b8796ff017f6ce9d55e37d401d63606cb2a86"
+    },
+    {
+      "path": "assets/riot/spells/Lux_W.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/LuxPrismaticWave.png",
+      "bytes": 6679,
+      "sha256": "9eec398494b60cb908ca2a5635463ad3ee63bce31521a7a3ce657dbc2c6627e2"
+    },
+    {
+      "path": "assets/riot/spells/Malphite_E.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/Landslide.png",
+      "bytes": 5760,
+      "sha256": "64555698f546abbabde11a4ea64664851100031b60c0b5dbf7d1da46efe35ccb"
+    },
+    {
+      "path": "assets/riot/spells/Malphite_P.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/passive/Malphite_GraniteShield.png",
+      "bytes": 6952,
+      "sha256": "6f1a68683f3df3b4c77222a32a1b75b7bd45b76fcac9f8dcc12e874da082244b"
+    },
+    {
+      "path": "assets/riot/spells/Malphite_Q.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/SeismicShard.png",
+      "bytes": 6172,
+      "sha256": "e6d43659b0b239ef3e010fff04e198f401449289432f0b81b1125dc592596d33"
+    },
+    {
+      "path": "assets/riot/spells/Malphite_R.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/UFSlash.png",
+      "bytes": 7235,
+      "sha256": "376a84bdde4b45f1e15921b4c30df8c13007a21b7ee6c3e62dc9937b9916105d"
+    },
+    {
+      "path": "assets/riot/spells/Malphite_W.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/Obduracy.png",
+      "bytes": 6803,
+      "sha256": "a04edaa0d7e535f82a16d3569801e3c51667711d9353f344991b7de1856f0529"
+    },
+    {
+      "path": "assets/riot/spells/MasterYi_E.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/WujuStyle.png",
+      "bytes": 5924,
+      "sha256": "927c1152295f5e7731a89eef0784f20633dd35523d07c0592e122c265aac39c7"
+    },
+    {
+      "path": "assets/riot/spells/MasterYi_P.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/passive/MasterYi_Passive1.png",
+      "bytes": 4477,
+      "sha256": "e2fec7b43f9e2bc724baa0cee0b036c5ba684443513616b7373ff303b425d611"
+    },
+    {
+      "path": "assets/riot/spells/MasterYi_Q.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/AlphaStrike.png",
+      "bytes": 4893,
+      "sha256": "dd7d81c33bd1d35781a1f28813f649fa94b9d99fe099f512bf156c40dc22e7cf"
+    },
+    {
+      "path": "assets/riot/spells/MasterYi_R.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/Highlander.png",
+      "bytes": 6238,
+      "sha256": "0e56c7df1cc9ad719c4c1004ce7307567d428b7746bbb5b6c79076fc49696a88"
+    },
+    {
+      "path": "assets/riot/spells/MasterYi_W.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/Meditate.png",
+      "bytes": 6124,
+      "sha256": "b7464d80adfefdbf9002ee0d97c4210299f97757e8df1910aa394f0b5ee39056"
+    },
+    {
+      "path": "assets/riot/spells/Soraka_E.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/SorakaE.png",
+      "bytes": 5417,
+      "sha256": "51551d03817c545a6eb53f65e7e6f14ebcb31fb8ed1f1af36af27e8ade40be6e"
+    },
+    {
+      "path": "assets/riot/spells/Soraka_P.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/passive/Soraka_Passive.png",
+      "bytes": 6239,
+      "sha256": "3fe1e466aa8861e70b38d02a668c5bf5f6ae55fd1d367e55ce017132d1c2c9fe"
+    },
+    {
+      "path": "assets/riot/spells/Soraka_Q.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/SorakaQ.png",
+      "bytes": 5642,
+      "sha256": "e00b483922a1becea90460dbdaa14194431455d4f73eb6fac3aa2ad0baed03d1"
+    },
+    {
+      "path": "assets/riot/spells/Soraka_R.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/SorakaR.png",
+      "bytes": 6257,
+      "sha256": "08662fa6c7a6ed5b5751aa798a0acfb38caace782fc533f80693980861a89200"
+    },
+    {
+      "path": "assets/riot/spells/Soraka_W.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/SorakaW.png",
+      "bytes": 5465,
+      "sha256": "7e085559e442aa8a470e3fcdff32f7b66ceff5387a59c8e73810ab72b104463d"
+    },
+    {
+      "path": "assets/riot/spells/SummonerFlash.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/SummonerFlash.png",
+      "bytes": 6266,
+      "sha256": "73c2831a4ec7d48d58a6e659bfb703339e7412b3965219fe5a0df429cd00fdc9"
+    },
+    {
+      "path": "assets/riot/spells/SummonerHeal.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/SummonerHeal.png",
+      "bytes": 6474,
+      "sha256": "cc97996d189fe50d899dc50966624b47f12c08f7fc9b3ff543a5daa6bebaa623"
+    },
+    {
+      "path": "assets/riot/spells/SummonerSmite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/spell/SummonerSmite.png",
+      "bytes": 6173,
+      "sha256": "02e8c680b1673032fa937f2ca1be5f1134145d3bcb9b1335b988bce67715d523"
+    },
+    {
+      "path": "assets/riot/splash/Ahri.jpg",
+      "url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg",
+      "bytes": 158108,
+      "sha256": "afe0ce6622095ce8a818b68162b88f916ba0e79f7a3621ce7a556ddc21d87770"
+    },
+    {
+      "path": "assets/riot/splash/Annie.jpg",
+      "url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Annie_0.jpg",
+      "bytes": 189787,
+      "sha256": "edad0269013114402d1d829b42ec052b9f9b8171dea19b1f1624c3ebab9a45f2"
+    },
+    {
+      "path": "assets/riot/splash/Ashe.jpg",
+      "url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ashe_0.jpg",
+      "bytes": 155309,
+      "sha256": "2c8ca3fcf121d7c8fe88bfe88f07062ee3a7bbc44674e95e0105d9bacdc09035"
+    },
+    {
+      "path": "assets/riot/splash/Caitlyn.jpg",
+      "url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Caitlyn_0.jpg",
+      "bytes": 171642,
+      "sha256": "3e164b540b074edd792f4444ab1efe6d887143260a24fd99681e95a982e659cc"
+    },
+    {
+      "path": "assets/riot/splash/Darius.jpg",
+      "url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Darius_0.jpg",
+      "bytes": 164239,
+      "sha256": "2a9b1bc256b33710bd7251df62ab069e2f979b7ef25506c6a04432617b26510a"
+    },
+    {
+      "path": "assets/riot/splash/Garen.jpg",
+      "url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_0.jpg",
+      "bytes": 196726,
+      "sha256": "b3b793811a9df402434dc5250d1f9d4c9b7fe0931412d2a719feaed1e283974e"
+    },
+    {
+      "path": "assets/riot/splash/Lux.jpg",
+      "url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_0.jpg",
+      "bytes": 196519,
+      "sha256": "d148fbcd3985d2f46f928a6ec65cca3c4f3d088692926cb5004352de73636e2e"
+    },
+    {
+      "path": "assets/riot/splash/Malphite.jpg",
+      "url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Malphite_0.jpg",
+      "bytes": 183784,
+      "sha256": "5448c1abac884e1ebb19dc01495524ebd7fcaa14f6dfb09c81deea6c2f942c6c"
+    },
+    {
+      "path": "assets/riot/splash/MasterYi.jpg",
+      "url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/MasterYi_0.jpg",
+      "bytes": 190829,
+      "sha256": "bf7678dc3b32abfd06bb5810274959e88d59234f7da0573ff67f3e864944a42f"
+    },
+    {
+      "path": "assets/riot/splash/Soraka.jpg",
+      "url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Soraka_0.jpg",
+      "bytes": 152745,
+      "sha256": "e36a257ef5e9a5638e29583a48d7a7d0284ab999b866d8f6fd9c85fda7863c38"
+    }
+  ]
+}

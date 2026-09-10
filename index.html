@@ -2,20 +2,25 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>英雄联盟 · 网页复刻版</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>召唤师峡谷 v1.2 · 英雄联盟练习场</title>
 <link rel="stylesheet" href="css/style.css">
+<script type="importmap">{"imports":{"three":"./js/vendor/three.module.js"}}</script>
 </head>
 <body>
 
 <!-- ================= 英雄选择 ================= -->
 <div id="select-screen">
+  <div class="select-shade"></div>
+  <nav class="client-nav"><a class="client-brand" href="index.html"><span>◈</span> LEAGUE <small>OF LEGENDS</small></a><div class="nav-center"><span class="active">召唤师峡谷</span><button id="btn-sources">素材与还原进度</button></div><span class="patch-label">v1.2 练习场 <i></i> 数据 14.24.1</span></nav>
   <div class="sel-header">
-    <h1>英雄联盟</h1>
-    <div class="sub">网页复刻版 · 召唤师峡谷 5V5</div>
+    <div class="eyebrow">SUMMONER’S RIFT</div>
+    <h1>选择你的英雄</h1>
+    <div class="sub">十位英雄，一座峡谷。由你决定这一战。</div>
   </div>
   <div class="sel-main">
     <div class="team-col blue">
-      <h3>我方（蓝色方）</h3>
+      <h3><i></i> 蓝色方阵容</h3>
       <div id="team-blue-list"></div>
     </div>
     <div class="sel-center">
@@ -31,18 +36,23 @@
       </div>
     </div>
     <div class="team-col red">
-      <h3>敌方（红色方）</h3>
+      <h3><i></i> 红色方阵容</h3>
       <div id="team-red-list"></div>
     </div>
   </div>
   <div class="sel-footer">
-    <button id="btn-lock">锁 定 英 雄</button>
+    <div class="match-options"><label>分路 <select id="role-select"><option value="top">上路</option><option value="jungle">打野</option><option value="mid">中路</option><option value="bot">下路</option><option value="support">辅助</option></select></label><div class="mode-picker"><button class="on" data-mode="classic">5V5 人机对局</button><button data-mode="practice">训练模式</button></div></div>
+    <button id="btn-lock">锁定 · 进入峡谷 <span>→</span></button>
+    <div class="select-note">右键移动与攻击 · Q W E R 施法 · 推荐先进入训练模式体验技能</div>
   </div>
+  <footer class="client-footer"><span>个人学习项目 · 非 Riot 官方游戏</span><span id="model-status">正在加载经典英雄 3D 模型…</span></footer>
 </div>
 
 <!-- ================= 游戏画面 ================= -->
 <div id="game-screen">
   <canvas id="game-canvas"></canvas>
+  <div id="match-panel"><div class="match-eyebrow">SUMMONER’S RIFT</div><div id="match-mode"></div><div id="practice-controls"><button id="practice-reset">重置状态</button><button id="practice-cooldowns">无限冷却：关</button><button id="practice-wave">生成兵线</button><button id="practice-reveal">全图视野：关</button></div><div id="match-help">右键移动 / 攻击 · A 攻击移动 · 4 放置守卫</div><div id="objective-timers"></div></div>
+  <div id="ability-hint"></div>
 
   <div id="top-frame">
     <span id="score-blue">0</span>
@@ -101,7 +111,7 @@
     </div>
     <div id="shop-tabs"></div>
     <div id="shop-grid"></div>
-    <div id="shop-hint">左键购买 · 在装备栏右键出售(70%) · 需在泉水附近购买</div>
+    <div id="shop-hint">左键购买，组件自动抵扣 · 装备栏右键出售 · 训练模式可随处购物</div>
   </div>
 
   <!-- 记分板 -->
@@ -135,6 +145,7 @@
         <div><b>M</b> 声音开关</div>
       </div>
       <button id="btn-resume">继续游戏</button>
+      <button id="btn-select">返回选人</button>
       <button id="btn-surrender">投降</button>
     </div>
   </div>
@@ -148,11 +159,20 @@
 </div>
 
 <div id="tooltip"></div>
+<dialog id="sources-dialog"><button id="close-sources" class="dialog-close">×</button><div class="eyebrow">PROJECT NOTES</div><h2>素材与还原进度</h2><p>英雄原画、头像、技能图标与基础属性来自 Riot Data Dragon，固定数据版本 14.24.1。原画 CDN 未提供版本隔离，下载时已记录校验值。</p><p>此版本实现 10 套可玩技能、三路建筑、兵线、12 个营地与河蟹、召唤物、草丛视野及地形寻路。地图使用 2024 峡谷地形图与原始导航网格；十位英雄使用经典版本的真实 3D 网格、骨骼和动画。建筑、野怪和多数特效仍为项目绘制，模型年代也未与数据补丁统一，完整数值与联网规则尚未达到 1:1。</p><div class="source-links"><a href="https://developer.riotgames.com/docs/lol" target="_blank" rel="noreferrer">Riot 素材文档 ↗</a><a href="docs/restoration-status.md" target="_blank">完整实现清单 ↗</a><a href="assets/riot/manifest.json" target="_blank">113 份素材来源记录 ↗</a><a href="assets/models/manifest.json" target="_blank">3D 模型来源 ↗</a><a href="assets/map/manifest.json" target="_blank">峡谷地图来源 ↗</a></div><img src="assets/riot/map/map11.png" width="160" height="160" alt="Riot 官方召唤师峡谷小地图参考"><small>官方小地图参考 · 对局使用 2024 峡谷地形与原始网格</small></dialog>
 
+<script src="js/riot-data.js"></script>
 <script src="js/data.js"></script>
+<script src="js/champions.js"></script>
+<script src="js/rift-map.js"></script>
+<script src="js/rift-grid.js"></script>
 <script src="js/engine.js"></script>
+<script src="js/rift-terrain.js"></script>
+<script src="js/rift-game.js"></script>
 <script src="js/render.js"></script>
+<script src="js/rift-render.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/main.js"></script>
+<script type="module" src="js/champion-models.js"></script>
 </body>
 </html>

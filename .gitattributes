@@ -1,0 +1,11 @@
+# Preserve the byte hashes recorded for downloaded source data and media.
+assets/riot/data/*.json -text
+assets/map/SOURCE-LICENSE.txt -text
+assets/models/VIEWER-LICENSE.txt -text
+*.png binary
+*.jpg binary
+*.webp binary
+*.glb binary
+
+# Upstream vendor formatting is retained.
+js/vendor/*.js -whitespace

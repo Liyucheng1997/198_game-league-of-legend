@@ -1,0 +1,422 @@
+{
+  "repository": "https://github.com/tengge1/lol-model-viewer",
+  "commit": "ef5635c5fbe0c315275c9bcccf83558cfe7ee436",
+  "modelEra": "archived classic; not 14.24.1",
+  "models": [
+    {
+      "id": "garen",
+      "championKey": 86,
+      "file": "assets/models/garen.glb",
+      "bytes": 4347324,
+      "sha256": "f51d0b74541e4e6168f21661ad017bb3e6c43267d7b276cc0746e8592ce999d1",
+      "vertices": 3932,
+      "bones": 68,
+      "clips": [
+        "attack1",
+        "attack2",
+        "death",
+        "recall_base",
+        "recall_loop_base",
+        "run",
+        "spell1",
+        "idle1",
+        "recall",
+        "recall_leadout",
+        "recall_winddown",
+        "run_haste",
+        "run_spell1",
+        "run_fast",
+        "spell4",
+        "spell3_0",
+        "spell3_180",
+        "spell3_-180",
+        "spell3_90",
+        "spell3_-90"
+      ],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/86_0.lmesh",
+          "sha256": "b35b4cacd57a80752576eabbc023c9b7c2a99b9b99268af807c36ae00adb70d7",
+          "bytes": 252673
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/textures/86/garen_base_tx_cm.png",
+          "sha256": "d365b4f677cb5e72f2fe2f7cf1667f42dfe4a6aeb2871d10825852afd932a1f1",
+          "bytes": 222069
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/86_0.lanim",
+          "sha256": "33be703aae5c40bd7b0a1c1ca8c015ac3bbe5709abb29ad7324723447cbcc815",
+          "bytes": 1380259
+        }
+      ]
+    },
+    {
+      "id": "darius",
+      "championKey": 122,
+      "file": "assets/models/darius.glb",
+      "bytes": 3748820,
+      "sha256": "22434c0845da88f563a7c59acaf2b137b81cf0132689032fc570d5e8f669e3b0",
+      "vertices": 5866,
+      "bones": 89,
+      "clips": [
+        "death",
+        "idle1",
+        "run",
+        "spell1",
+        "spell2",
+        "spell3",
+        "spell4",
+        "recall",
+        "idle2",
+        "spell2_idle",
+        "spell2_run",
+        "attack1",
+        "attack2",
+        "spell1windup"
+      ],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/122_0.lmesh",
+          "sha256": "537dee803d4754d54af7fb1235ddcfaec80f0ecbdafce7e0b3366235e4cd0112",
+          "bytes": 374338
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/textures/122/darius_base_tx_cm.png",
+          "sha256": "d729fe370fb7e3dc7a79b34fbf4facd01c30aceb3f5011e5fe43157b3d2f5b32",
+          "bytes": 242055
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/122_0.lanim",
+          "sha256": "4c612f49b6fa7e730f2ed2232c87e7d1441d05db5a9de7dcb5bc66c9999e6933",
+          "bytes": 1162501
+        }
+      ]
+    },
+    {
+      "id": "ashe",
+      "championKey": 22,
+      "file": "assets/models/ashe.glb",
+      "bytes": 5761268,
+      "sha256": "89f9ac8385814ad4f8b9f87cb933ed35ea7ffa2fdf2bd6692197aebf2be72ecb",
+      "vertices": 4902,
+      "bones": 85,
+      "clips": [
+        "attack1",
+        "death",
+        "idle1",
+        "idle2",
+        "idle3",
+        "idle4",
+        "idle5",
+        "run",
+        "run2",
+        "run3",
+        "spell1",
+        "spell4",
+        "attack2",
+        "spell3",
+        "spell2",
+        "spell1_in"
+      ],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/22_0.lmesh",
+          "sha256": "4f210d4aea3e6f7c0f5fe940f177ac3d80439b88e560bbafc2cd803cda8b96ca",
+          "bytes": 312381
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/textures/22/ashe_base_2011_tx_cm.png",
+          "sha256": "2fbce6b8b82ad273ad53122b6ba4c060533a6452ba2e0ec66480003aeb5ff2da",
+          "bytes": 203368
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/22_0.lanim",
+          "sha256": "d675782cd07d78ad52d3de4c982a1545babfe36a06da8ecdf510d20a23d54e04",
+          "bytes": 2478818
+        }
+      ]
+    },
+    {
+      "id": "caitlyn",
+      "championKey": 51,
+      "file": "assets/models/caitlyn.glb",
+      "bytes": 3421088,
+      "sha256": "9118e6b371b7d439347ec82c6cc6d2290acf88496e59e4aa09d435c6a8171435",
+      "vertices": 5641,
+      "bones": 81,
+      "clips": [
+        "death",
+        "idle1",
+        "idle2",
+        "idle3",
+        "run",
+        "spell1",
+        "spell2",
+        "spell3",
+        "spell3b",
+        "spell4",
+        "attackselector"
+      ],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/51_0.lmesh",
+          "sha256": "36acfbbebd7d838acd8d0acf933b7838df0530d7127f0719422f58594e5e7590",
+          "bytes": 347435
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/textures/51/caitlyn_base_tx_cm_v01.png",
+          "sha256": "c698189f437e2c00e35a6a2ee77038759ff051f844f07e72f6234e45dcc44794",
+          "bytes": 261586
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/51_0.lanim",
+          "sha256": "3d173b48881cbf318d44edd688810c2480cd2c3be1c0cdcf9470979658d08daa",
+          "bytes": 1235806
+        }
+      ]
+    },
+    {
+      "id": "ahri",
+      "championKey": 103,
+      "file": "assets/models/ahri.glb",
+      "bytes": 4183200,
+      "sha256": "0ecfc08c1c3f66b1b061ca8846a93a0a152c3746f6914c34ba8f2107de389551",
+      "vertices": 6565,
+      "bones": 81,
+      "clips": [
+        "idle3",
+        "idle1",
+        "spell2",
+        "spell3",
+        "spell4",
+        "spell1",
+        "death",
+        "run",
+        "attack1",
+        "idle2",
+        "idle5",
+        "idle4"
+      ],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/103_0.lmesh",
+          "sha256": "050b7dd986cc9e3c2258f32381f1b4d77d3d60aefab5e9a22fbe5ea8fb15cf33",
+          "bytes": 415393
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/textures/103/ahri_base_tx_cm.png",
+          "sha256": "4489fb3b3d3583eac1e7ebcda9d7ba9f2de44e572d408e1392e82972b9f53793",
+          "bytes": 257882
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/103_0.lanim",
+          "sha256": "e8e67b4b37c47e61ee3f9c8064d8c385baf87d3daa136cfc16f5d57996265de7",
+          "bytes": 2980837
+        }
+      ]
+    },
+    {
+      "id": "lux",
+      "championKey": 99,
+      "file": "assets/models/lux.glb",
+      "bytes": 3297780,
+      "sha256": "a6a0beee6e870f52a2639642692e3f601815a1460736a6cbc29659f4f80d52b5",
+      "vertices": 3277,
+      "bones": 79,
+      "clips": [
+        "attack1",
+        "attack2",
+        "death",
+        "idle1",
+        "idle2",
+        "idle3",
+        "idle4",
+        "run",
+        "spell1",
+        "spell2",
+        "spell3",
+        "spell4"
+      ],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/99_0.lmesh",
+          "sha256": "31814c560d7036624ef44bad4ff0a1d99a51efbc91f53f3d4a4767697cb84f14",
+          "bytes": 212032
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/textures/99/lux_base_cm_tx.png",
+          "sha256": "7d15b20a516b9092a45b5f7a5f05c5802d5835acd2e749d418e48de4cf2879c7",
+          "bytes": 249067
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/99_0.lanim",
+          "sha256": "33f5f960486022087bde649571897cdcbfd82b1396866d3116accdfba938e168",
+          "bytes": 2316008
+        }
+      ]
+    },
+    {
+      "id": "annie",
+      "championKey": 1,
+      "file": "assets/models/annie.glb",
+      "bytes": 2130368,
+      "sha256": "850b3a172c83225ee49b844ac66de98af9e3a3ab1f5387d04949a3c948e4f376",
+      "vertices": 4129,
+      "bones": 81,
+      "clips": [
+        "attack1",
+        "attack2",
+        "death",
+        "run",
+        "spell1",
+        "spell2",
+        "spell3",
+        "spell4",
+        "recall",
+        "idle1"
+      ],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/1_0.lmesh",
+          "sha256": "cbcc53e202cc1e707a8d8e32dc2b0fa2b6dfcc33639bb6d99e66478cad47e451",
+          "bytes": 264346
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/textures/1/annie_base_2012_cm.png",
+          "sha256": "1196deab5da104bf483038f832ba5c226f0a81b9f37de168960e47be10ca36bd",
+          "bytes": 220412
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/1_0.lanim",
+          "sha256": "b94fc34ccfd5d69a8c07797f4474860927042c28be6b53afeb9d79916c264605",
+          "bytes": 1123597
+        }
+      ]
+    },
+    {
+      "id": "yi",
+      "championKey": 11,
+      "file": "assets/models/yi.glb",
+      "bytes": 4299340,
+      "sha256": "d3244dedd7fed348da327dd2695536ad9a0374bb4e49f946bfe3f698d91bee68",
+      "vertices": 5760,
+      "bones": 90,
+      "clips": [
+        "spell1",
+        "spell3",
+        "death",
+        "run",
+        "spell2_old",
+        "idle1",
+        "spell2_in",
+        "spell2",
+        "recall",
+        "run_fast",
+        "run_haste",
+        "attack1_wuju",
+        "attack2_wuju",
+        "attack1",
+        "attack2"
+      ],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/11_0.lmesh",
+          "sha256": "ad7e7d8086b3c2fd661397b1112105cf6c3644eacc2a00da3cac5cca2287aec7",
+          "bytes": 367925
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/textures/11/masteryi_2013_tx_cm.png",
+          "sha256": "7dba012f736cd2225f438f38eb8d522d9039bedc166779760b981d6bb329019b",
+          "bytes": 875503
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/11_0.lanim",
+          "sha256": "fc901ba6a4782d5417cc0d475ab61d5cf3449d2be1f3b29a1e9c0be9db17d467",
+          "bytes": 1399798
+        }
+      ]
+    },
+    {
+      "id": "malphite",
+      "championKey": 54,
+      "file": "assets/models/malphite.glb",
+      "bytes": 2008336,
+      "sha256": "288cc6680efc0f784b6af59c8047f3e2ad7fcc6c1f562a103e7a8acbbb6a45a9",
+      "vertices": 1610,
+      "bones": 46,
+      "clips": [
+        "attack1",
+        "attack2",
+        "death",
+        "idle1",
+        "idle2",
+        "idle3",
+        "idle4",
+        "run",
+        "spell1",
+        "spell2",
+        "spell4",
+        "spell3"
+      ],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/54_0.lmesh",
+          "sha256": "8ec0b918f5ba0fd4a47bd325110191a3b181c44f6f2bbeaa12e7552780dc20e0",
+          "bytes": 99750
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/textures/54/malphite.png",
+          "sha256": "342b5a36a069de3578368d4d30722782aeff71d471f4b5e667280a751d2f9409",
+          "bytes": 934998
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/54_0.lanim",
+          "sha256": "5a7e7f69a7a627a983cf23b5864d1ad453c75d36b41b0987d180926c2901365c",
+          "bytes": 320131
+        }
+      ]
+    },
+    {
+      "id": "soraka",
+      "championKey": 16,
+      "file": "assets/models/soraka.glb",
+      "bytes": 3796288,
+      "sha256": "10427038cf737e1eca708f8400a2bc431ec1a0bfefcd9dd7c989e46b2dfb3b39",
+      "vertices": 6440,
+      "bones": 79,
+      "clips": [
+        "attack1",
+        "attack2",
+        "idle1",
+        "idle2",
+        "idle3",
+        "idle4",
+        "death",
+        "spell1",
+        "spell2",
+        "spell3",
+        "spell4",
+        "recall",
+        "run"
+      ],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/16_0.lmesh",
+          "sha256": "7a21d933d6e2a4fa32b2c210bf0a0f000542bee4f99ead8e43514a39011b59c9",
+          "bytes": 407981
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/textures/16/soraka_base_tx_cm.png",
+          "sha256": "0abf05c66db7d33e6d3aaac82099cf955ffc5ad9d6a7d180f6d668614791591d",
+          "bytes": 254351
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tengge1/lol-model-viewer/ef5635c5fbe0c315275c9bcccf83558cfe7ee436/LOLModelViewer/LOLModelViewer/resource/models/16_0.lanim",
+          "sha256": "7132d817b252bd7eb7dd0a07731ba5bc4b13c26098593b46682159ea215431a8",
+          "bytes": 1610422
+        }
+      ]
+    }
+  ]
+}
