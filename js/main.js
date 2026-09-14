@@ -6,7 +6,7 @@ let cam={x:1000, y:6000, zoom:1, locked:true};
 let mouse={x:0,y:0, sx:0, sy:0};
 let canvas, ctx, mmCanvas, mmCtx;
 let selectedChamp=null;
-let selectedMode='classic',selectedRole='top',attackMoveArmed=false;
+let selectedMode='dodge',selectedRole='top',attackMoveArmed=false;
 
 /* ---------- 英雄选择界面 ---------- */
 function initSelect(){
@@ -20,7 +20,7 @@ function initSelect(){
   });
   $('#btn-lock').addEventListener('click',()=>{ if(selectedChamp) startGame(selectedChamp.id); });
   $('#role-select').addEventListener('change',e=>{selectedRole=e.target.value;updateDraftPreview();});
-  $$('.mode-picker button').forEach(b=>b.addEventListener('click',()=>{selectedMode=b.dataset.mode;$$('.mode-picker button').forEach(x=>x.classList.toggle('on',x===b));$('#btn-lock').innerHTML=(selectedMode==='practice'?'进入训练模式':'锁定 · 进入峡谷')+' <span>→</span>';}));
+  $$('.mode-picker button').forEach(b=>b.addEventListener('click',()=>{selectedMode=b.dataset.mode;$$('.mode-picker button').forEach(x=>x.classList.toggle('on',x===b));$('#btn-lock').innerHTML=(selectedMode==='dodge'?'开始走位挑战':selectedMode==='practice'?'进入训练模式':'锁定 · 进入峡谷')+' <span>→</span>';}));
   $('#btn-sources').addEventListener('click',()=>$('#sources-dialog').showModal());
   $('#close-sources').addEventListener('click',()=>$('#sources-dialog').close());
   selectChamp(CHAMP_BY_ID.ahri||CHAMPIONS[0]);
@@ -44,6 +44,7 @@ function updateDraftPreview(){const draft=createDraft(selectedChamp.id,selectedR
 
 /* ---------- 开始游戏 ---------- */
 async function startGame(champId){
+  if(selectedMode==='dodge'){window.startDodge(champId);return;}
   const button=$('#btn-lock');button.disabled=true;button.textContent='正在准备峡谷…';
   try{await RIFT_MAP_READY;}catch(error){button.textContent='地图加载失败 · 点击重试';button.disabled=false;return;}
   $('#select-screen').style.display='none';

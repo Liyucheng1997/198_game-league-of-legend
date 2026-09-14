@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>召唤师峡谷 v1.2 · 英雄联盟练习场</title>
+<title>走位实验室 v1.3 · 十英雄挑战</title>
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dodge.css">
 <script type="importmap">{"imports":{"three":"./js/vendor/three.module.js"}}</script>
 </head>
 <body>
@@ -12,11 +13,11 @@
 <!-- ================= 英雄选择 ================= -->
 <div id="select-screen">
   <div class="select-shade"></div>
-  <nav class="client-nav"><a class="client-brand" href="index.html"><span>◈</span> LEAGUE <small>OF LEGENDS</small></a><div class="nav-center"><span class="active">召唤师峡谷</span><button id="btn-sources">素材与还原进度</button></div><span class="patch-label">v1.2 练习场 <i></i> 数据 14.24.1</span></nav>
+  <nav class="client-nav"><a class="client-brand" href="index.html"><span>◈</span> LEAGUE <small>OF LEGENDS</small></a><div class="nav-center"><span class="active">召唤师峡谷</span><button id="btn-sources">素材与还原进度</button></div><span class="patch-label">v1.3 走位挑战 <i></i> 数据 14.24.1</span></nav>
   <div class="sel-header">
     <div class="eyebrow">SUMMONER’S RIFT</div>
     <h1>选择你的英雄</h1>
-    <div class="sub">十位英雄，一座峡谷。由你决定这一战。</div>
+    <div class="sub">十位英雄轮番出招。练反应、练走位，把每一次躲避变成分数。</div>
   </div>
   <div class="sel-main">
     <div class="team-col blue">
@@ -41,9 +42,9 @@
     </div>
   </div>
   <div class="sel-footer">
-    <div class="match-options"><label>分路 <select id="role-select"><option value="top">上路</option><option value="jungle">打野</option><option value="mid">中路</option><option value="bot">下路</option><option value="support">辅助</option></select></label><div class="mode-picker"><button class="on" data-mode="classic">5V5 人机对局</button><button data-mode="practice">训练模式</button></div></div>
-    <button id="btn-lock">锁定 · 进入峡谷 <span>→</span></button>
-    <div class="select-note">右键移动与攻击 · Q W E R 施法 · 推荐先进入训练模式体验技能</div>
+    <div class="match-options"><label>分路 <select id="role-select"><option value="top">上路</option><option value="jungle">打野</option><option value="mid">中路</option><option value="bot">下路</option><option value="support">辅助</option></select></label><div class="mode-picker"><button class="on" data-mode="dodge">走位挑战 · 躲技能得分</button><button data-mode="classic">5V5 人机对局</button><button data-mode="practice">训练模式</button></div></div>
+    <button id="btn-lock">开始走位挑战 <span>→</span></button>
+    <div class="select-note">走位挑战：右键移动 · D 闪现 · S 停止 · 90 秒内躲避技能得分</div>
   </div>
   <footer class="client-footer"><span>个人学习项目 · 非 Riot 官方游戏</span><span id="model-status">正在加载经典英雄 3D 模型…</span></footer>
 </div>
@@ -172,6 +173,8 @@
 <script src="js/render.js"></script>
 <script src="js/rift-render.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/dodge-core.js"></script>
+<script src="js/dodge-ui.js"></script>
 <script src="js/main.js"></script>
 <script type="module" src="js/champion-models.js"></script>
 </body>
