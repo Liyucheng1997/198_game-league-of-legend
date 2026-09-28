@@ -178,7 +178,6 @@ export class Game {
         if (e.target !== cv && e.target !== this.app.overlay.c) return;
         this.mouse.x = e.clientX; this.mouse.y = e.clientY;
         if (e.button === 2 && this.aiming) { this.aiming = null; return; }
-        if (e.button === 0 && this.aHeld) { this.attackMove(); return; }
         if (e.button === 0 && !this.over) { const k = this.keeperAt(this.mouse.x, this.mouse.y); if (k) { this.visitShop(k); return; } }
         if (e.button === 2) { this.rightDown = true; this.rightClick(true); }
       },
@@ -214,7 +213,11 @@ export class Game {
   key(e, down) {
     const k = e.key.toLowerCase();
     if (k === 'tab') { e.preventDefault(); $('#tabboard').classList.toggle('hidden', !down); if (down) this.fillTab(); return; }
-    if (k === 'a') { this.aHeld = down; if (down) return; }
+    if (k === 'a') {
+      this.aHeld = down;
+      if (down && !e.repeat && !this.paused && !this.over) this.attackCommand();
+      if (down) return;
+    }
     if (!down) {
       if (this.aiming && k === this.aiming.toLowerCase()) { const key = this.aiming; this.aiming = null; this.castNow(key); }
       return;
@@ -252,12 +255,30 @@ export class Game {
     else if (res === 'unlearned') this.hint(p.points > 0 ? '还没学这个技能：按 Shift+' + key + ' 或点技能上方的 +' : '还没学这个技能');
     if (res !== 'ok' && res !== 'dead') this.app.sound.play('error', null, 0.5);
   }
-  attackMove() {
-    const p = this.player, gp = this.groundAt(this.mouse.x, this.mouse.y);
-    // 攻击移动：攻击点击位置附近最近的敌人，没有就走过去
-    const u = this.pickUnit(this.mouse.x, this.mouse.y) || this.world.nearestEnemy(p.team, gp, 6);
-    if (u && u.team !== p.team) { p.orderAttack(u); this.world.vfx.ring(u.pos, { r0: 2, r1: 0.8, color: '#ff5a4a', dur: 0.3 }); }
-    else { p.orderMove(gp.x, gp.z); this.world.vfx.ring(gp, { r0: 1.2, r1: 0.3, color: '#ff9a7a', dur: 0.35 }); }
+  // 按 A：攻击鼠标附近最近的敌人（同距离优先英雄），附近没有敌人就攻击移动过去
+  attackCommand() {
+    const p = this.player;
+    if (p.dead) return;
+    const gp = this.groundAt(this.mouse.x, this.mouse.y);
+    let best = this.pickUnit(this.mouse.x, this.mouse.y), bs = 1e9;
+    if (best && (best.team === p.team || best.kind === 'dummy')) best = null;
+    if (!best) {
+      for (const u of this.world.units) {
+        if (u.removed || !u.targetable || u.team === p.team || u.inFog || u.kind === 'dummy') continue;
+        const d = Math.hypot(u.pos.x - gp.x, u.pos.z - gp.z) - u.radius;
+        if (d > 7) continue;
+        const s = d - (u.kind === 'hero' ? 1.5 : 0) + (u.isStructure ? 3 : 0);
+        if (s < bs) { bs = s; best = u; }
+      }
+    }
+    this.mmDest = null;
+    if (best) {
+      p.orderAttack(best, { x: gp.x, z: gp.z });
+      this.world.vfx.ring(best.pos, { r0: 2.2, r1: 0.8, color: '#ff5a4a', dur: 0.3 });
+    } else {
+      p.orderAttackMove(gp.x, gp.z);
+      this.world.vfx.ring(gp, { r0: 1.4, r1: 0.3, color: '#ff7a5a', dur: 0.35 });
+    }
   }
   groundAt(x, y) {
     const v = new THREE.Vector2(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1);

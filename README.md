@@ -1,4 +1,4 @@
-# 手绘峡谷 v1.4 · 卡通手绘英雄联盟
+# 手绘峡谷 v1.4.1 · 卡通手绘英雄联盟
 
 [在线试玩](https://liyucheng1997.github.io/198_game-league-of-legend/) · [v1.4 发布说明](docs/release-v1.4.md) · [手绘版说明](toon/README.md)
 
@@ -10,7 +10,7 @@
 python toon/serve.py
 ```
 
-然后打开 <http://127.0.0.1:8196/toon/>。操作：右键移动/攻击，按住 Q W E R 瞄准、松开施放，D/F 召唤师技能，P 商店，B 回城，Tab 战绩。完整说明见 [toon/README.md](toon/README.md)。
+然后打开 <http://127.0.0.1:8196/toon/>。操作：右键移动/攻击，A 攻击鼠标附近的敌人，按住 Q W E R 瞄准、松开施放，D/F 召唤师技能，P 商店，B 回城，Tab 战绩。完整说明见 [toon/README.md](toon/README.md)。
 
 旧版（v1.3 走位实验室与原版素材峡谷）保留在 [classic.html](classic.html)，以下为旧版说明。
 

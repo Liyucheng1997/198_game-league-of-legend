@@ -300,15 +300,39 @@ export class Hero extends Unit {
   stop() { this.order = null; this.path = null; }
   orderMove(x, z) {
     if (this.dead) return;
+    this.cancelWindup();
     this.order = { type: 'move' };
     this.moveTo(x, z);
     this.cancelRecall();
   }
-  orderAttack(u) {
+  orderAttack(u, amove = null) {
     if (this.dead || !u || !u.targetable) return;
-    this.order = { type: 'attack', target: u };
+    this.order = { type: 'attack', target: u, amove };
     this.pathT = 0;
     this.cancelRecall();
+  }
+  // 攻击移动：朝目标点走，途中自动攻击进入攻击范围的敌人
+  orderAttackMove(x, z) {
+    if (this.dead) return;
+    this.order = { type: 'amove', x, z };
+    this.moveTo(x, z);
+    this.cancelRecall();
+  }
+  // 前摇阶段收到移动指令：取消这次攻击，不进入冷却
+  cancelWindup() {
+    if (!this.windup) return;
+    this.windup = null;
+    this.atkCd = 0; this.castLock = 0;
+    if (this.rig.action && this.rig.action.atk) this.rig.action = null;
+  }
+  acquire(r) {
+    let best = null, bd = 1e9;
+    for (const u of this.world.units) {
+      if (u.removed || !u.targetable || u.team === this.team || u.inFog || u.kind === 'dummy') continue;
+      const d = this.dist(u) - u.radius + (u.isStructure ? 4 : 0);
+      if (d <= r && d < bd) { bd = d; best = u; }
+    }
+    return best;
   }
   cancelRecall() {
     if (this.recallT > 0) {
@@ -463,9 +487,17 @@ export class Hero extends Unit {
       this.step(dt, s.x, s.z, 1.2); this.baseSpeed = sp;
     } else if (!this.dashing && this.canAct()) {
       const o = this.order;
-      if (o && o.type === 'attack') {
+      if (o && o.type === 'amove') {
+        const t = this.acquire(this.range + this.radius + 2.5);
+        if (t) this.orderAttack(t, { x: o.x, z: o.z });
+        else if (this.path && this.canMove()) { if (this.followPath(dt)) this.order = null; }
+        else if (!this.path) this.order = null;
+      } else if (o && o.type === 'attack') {
         const t = o.target;
-        if (!t || !t.targetable) { this.order = null; this.path = null; }
+        if (!t || !t.targetable || t.inFog) {
+          // 目标没了：攻击移动时继续朝原目标点前进
+          if (o.amove) this.orderAttackMove(o.amove.x, o.amove.z); else { this.order = null; this.path = null; }
+        }
         else {
           const reach = this.range + t.radius + this.radius * 0.5;
           if (this.dist(t) <= reach) {
@@ -506,8 +538,12 @@ export class Hero extends Unit {
     const anims = Array.isArray(def.atkAnim) ? def.atkAnim : [def.atkAnim || 'slash'];
     const combo = this.atkCombo = ((this.atkCombo || 0) + 1) % anims.length;
     this.rig.play(anims[combo], Math.min(0.7, 0.75 / as));
+    if (this.rig.action) this.rig.action.atk = true;
     if (!def.atkProj) W.sfx('swing', this.pos, 0.7);
+    const wu = this.windup = { t };
     W.after(wind, () => {
+      if (this.windup !== wu) return; // 前摇被移动取消
+      this.windup = null;
       if (this.dead || !t.targetable) return;
       if (def.atkProj) {
         const from = this.tipPos();
