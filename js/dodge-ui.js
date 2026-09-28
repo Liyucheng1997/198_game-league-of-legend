@@ -4,7 +4,7 @@ window.startDodge=function(hero){
   let panel=document.getElementById('dodge-screen');
   if(!panel){panel=document.createElement('main');panel.id='dodge-screen';panel.innerHTML=`
     <canvas id="dodge-canvas" aria-label="走位挑战场地，右键点击移动"></canvas>
-    <header class="dodge-top"><a href="index.html">◈ 返回选人</a><div><small>MOVEMENT LAB / 走位实验室</small><h1>让每一步，都恰到好处。</h1></div><button id="dodge-settings">设置</button><button id="dodge-pause">暂停 · Esc</button></header>
+    <header class="dodge-top"><a href="classic.html">◈ 返回选人</a><div><small>MOVEMENT LAB / 走位实验室</small><h1>让每一步，都恰到好处。</h1></div><button id="dodge-settings">设置</button><button id="dodge-pause">暂停 · Esc</button></header>
     <aside class="dodge-config"><span class="dodge-eyebrow">90 秒 · 十英雄挑战</span><h2 id="dodge-hero"></h2><p>右键点击或按住移动<br>S 停止 · D 闪现（15 秒）</p>
       <label>训练强度<select id="dodge-difficulty"><option value="beginner">入门 · 延长预警</option><option value="standard" selected>标准 · 连续躲避</option><option value="expert">进阶 · 多重交叉</option></select></label>
       <label>对手<select id="dodge-opponent"><option value="all">全部十位 · 依次轮换</option>${DODGE_KITS.map(k=>`<option value="${k.id}">${CHAMP_BY_ID[k.id].name} · ${k.name}</option>`).join('')}</select></label>
@@ -13,7 +13,7 @@ window.startDodge=function(hero){
     </aside>
     <section class="dodge-score"><div><small>本局得分</small><strong id="dodge-points">0</strong></div><div><small>连续躲避</small><strong id="dodge-combo">0</strong></div><div><small>命中 / 10</small><strong id="dodge-hits">0</strong></div><div><small>剩余时间</small><strong id="dodge-time">90</strong></div></section>
     <div id="dodge-feedback" role="status"></div><footer class="dodge-bottom"><span id="dodge-flash">D · 闪现就绪</span><span>躲避 +100 · 连击加成最高 +200 · 擦边 +50</span><span id="dodge-best"></span></footer>
-    <div id="dodge-modal" class="dodge-modal" hidden><div><small>MOVEMENT LAB</small><h2 id="dodge-modal-title"></h2><p id="dodge-result"></p><button id="dodge-continue">继续训练</button><button id="dodge-again">再练一局</button><a href="index.html">返回选人</a></div></div>`;document.body.appendChild(panel);}
+    <div id="dodge-modal" class="dodge-modal" hidden><div><small>MOVEMENT LAB</small><h2 id="dodge-modal-title"></h2><p id="dodge-result"></p><button id="dodge-continue">继续训练</button><button id="dodge-again">再练一局</button><a href="classic.html">返回选人</a></div></div>`;document.body.appendChild(panel);}
   const $d=id=>document.getElementById(id),cv=$d('dodge-canvas'),cx=cv.getContext('2d');let session,previous=performance.now(),view={scale:1,x:0,y:0},held=false,pointer={x:0,y:0},best=0;
   try{best=Number(localStorage.getItem('rift-dodge-best-v1'))||0;}catch{}
   function restart(){session=new DodgeSession({hero,speed:CHAMP_BY_ID[hero].base.ms*2,difficulty:$d('dodge-difficulty').value,opponent:$d('dodge-opponent').value});session.player.def=CHAMP_BY_ID[hero];window.dodgeSession=session;window.RiftModels?.clear();$d('dodge-modal').hidden=true;$d('dodge-hero').textContent=CHAMP_BY_ID[hero].name+' · '+session.speed+' 移速';previous=performance.now();held=false;panel.classList.remove('settings-open');}
