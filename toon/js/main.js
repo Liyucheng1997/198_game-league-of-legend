@@ -37,7 +37,7 @@ class App {
     const step = async (msg, pct) => { $('#load-msg').textContent = msg; $('#load-bar').style.width = pct + '%'; await frame(); };
 
     await step('正在削铅笔……', 10);
-    await step('正在给十位英雄画像……', 25);
+    await step('正在给三十位英雄画像……', 25);
     this.portraits = renderPortraits(renderer);
     await step('正在手绘技能与装备图标……', 55);
     this.icons = { D: skillArt('D', '#c89a3a') || skillIcon('#e8c25a', '闪'), F: skillArt('F', '#3f8a52') || skillIcon('#5fae6e', '愈') };

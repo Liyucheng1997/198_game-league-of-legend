@@ -1,6 +1,7 @@
 // 单位：英雄、小兵、防御建筑、野怪、训练假人、召唤物。
 import * as THREE from 'three';
 import { HERO_MODELS, tibbersRig } from './hero-models.js';
+import { HERO_MODELS2 } from './hero-models2.js';
 import { MAX_RANK, R_LEVELS, xpNeed } from './heroes.js';
 import { ITEM_BY_ID, sumStats, sellPrice } from './items.js';
 import { SPELLS, castSpell, updateTeleport } from './summoners.js';
@@ -136,7 +137,7 @@ export class Unit {
 // ---------------- 英雄 ----------------
 export class Hero extends Unit {
   constructor(world, def, team, x, z) {
-    const rig = HERO_MODELS[def.id]();
+    const rig = (HERO_MODELS[def.id] || HERO_MODELS2[def.id])();
     super(world, { kind: 'hero', team, x, z, hp: def.hp, radius: def.radius ?? 0.7, speed: def.speed, ad: def.ad, range: def.range, atkSpeed: def.atkSpeed, height: 2.6 * rig.s.scale, name: def.name, obj: rig.root });
     this.def = def;
     this.rig = rig;
@@ -446,6 +447,7 @@ export class Hero extends Unit {
       return;
     }
     this.updateBuffs(dt);
+    this.def.tick && this.def.tick(W, this, dt);
     updateTeleport(this, dt);
     for (const k in this.cds) if (this.cds[k] > 0) this.cds[k] = Math.max(0, this.cds[k] - dt * (W.cdMul || 1));
     this.atkCd -= dt;
@@ -566,6 +568,7 @@ export class Hero extends Unit {
   attackHit(t) {
     const W = this.world;
     let dmg = this.ad, crit = false;
+    if (this.has('blind')) { W.vfx.comic(t.pos, '落空!', { color: '#c8c8c8', size: 1.4, y: 2.6 }); return; }
     if (t.isStructure) dmg *= 0.8;
     else if (Math.random() < this.crit) {
       crit = true;
@@ -577,6 +580,7 @@ export class Hero extends Unit {
     if (this.uniques.has('nashor')) W.damage(this, t, 20 + this.ap * 0.15, { type: 'magic', auto: true, noText: true });
     for (const b of [...this.buffs]) if (b.onHit) b.onHit(W, this, t, b);
     if (this.def.onHitSlow) W.cc(t, 'slow', 1, { pct: 0.2, id: 'frost' });
+    if (this.def.onHit && !t.isStructure) this.def.onHit(W, this, t);
     W.vfx.puff({ x: t.pos.x, z: t.pos.z }, { n: 4, color: this.def.hitColor || '#ffffff', cell: 'spark', glow: true, size: 0.6, y: t.height * 0.5, speed: 3 });
   }
   tipPos() {

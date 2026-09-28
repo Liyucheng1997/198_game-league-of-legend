@@ -3,20 +3,20 @@ import * as THREE from 'three';
 import { P, G, toon, glowMat, canvasTex } from './toon-kit.js';
 import { Rig, chain } from './rig.js';
 
-const SKIN = '#f5cfb4';
+export const SKIN = '#f5cfb4';
 const DS = THREE.DoubleSide;
 
-function held(hand, rx = Math.PI / 2, o = {}) {
+export function held(hand, rx = Math.PI / 2, o = {}) {
   const g = new THREE.Group();
   g.rotation.set(rx, o.ry || 0, o.rz || 0);
   if (o.pos) g.position.set(...o.pos);
   hand.add(g);
   return g;
 }
-function tipAt(parent, x, y, z) {
+export function tipAt(parent, x, y, z) {
   const t = new THREE.Object3D(); t.position.set(x, y, z); parent.add(t); return t;
 }
-function hairCap(r, color, o = {}) {
+export function hairCap(r, color, o = {}) {
   const R = r.s.headR;
   return P(G.hemi(), color, {
     parent: r.head, mat: toon(color, { side: DS }),
@@ -24,17 +24,17 @@ function hairCap(r, color, o = {}) {
     rot: [o.tilt ?? -0.5, 0, 0], pos: [0, R * (o.y ?? 0.02), -R * (o.back ?? 0.04)], ol: 0.03,
   });
 }
-function blob(r, parent, color, nx, ny, nz, s, lift = 0) {
+export function blob(r, parent, color, nx, ny, nz, s, lift = 0) {
   const p = r.onHead(nx, ny, nz, lift);
   return P(G.sphere(), color, { parent, pos: p.pos, rot: p.rot, order: 'YXZ', s });
 }
-function spikeOnHead(r, color, nx, ny, nz, rad, len, tilt = 0) {
+export function spikeOnHead(r, color, nx, ny, nz, rad, len, tilt = 0) {
   const p = r.onHead(nx, ny, nz, -rad * 0.4);
   const g = new THREE.Group(); g.position.set(...p.pos); g.rotation.set(p.rot[0], p.rot[1], 0, 'YXZ'); r.head.add(g);
   P(G.cone(rad, len, 8), color, { parent: g, pos: [0, 0, len * 0.4], rot: [Math.PI / 2 + tilt, 0, 0] });
   return g;
 }
-function cape(r, color, o = {}) {
+export function cape(r, color, o = {}) {
   const s = r.s;
   const pivot = new THREE.Group();
   pivot.position.set(0, s.bodyH * (o.y ?? 0.86), -s.bodyW * 0.72);
@@ -51,7 +51,7 @@ function cape(r, color, o = {}) {
   });
   return pivot;
 }
-function sway(r, nodes, amp = 0.15, speed = 3, base = 0.12) {
+export function sway(r, nodes, amp = 0.15, speed = 3, base = 0.12) {
   r.hooks.push((dt, t) => {
     nodes.forEach((n, j) => {
       n.rotation.x = base * (j + 1) * 0.3 + r.moveBlend * 0.25 + Math.sin(t * speed - j * 0.8) * amp;

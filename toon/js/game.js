@@ -6,7 +6,7 @@ import { Hero, Minion, Structure, Monster } from './units.js';
 import { HEROES, HERO_BY_ID, xpNeed, MAX_RANK } from './heroes.js';
 import { HeroBot } from './ai.js';
 import { Minimap } from './hud.js';
-import { Shop, renderInventory } from './shop.js';
+import { Shop, renderInventory, renderReserve, autoBuyReserve } from './shop.js';
 import { BUILDS, ITEM_BY_ID } from './items.js';
 import { TEAM_COL as TCOL } from './props.js';
 import { FOG } from './toon-kit.js';
@@ -82,7 +82,8 @@ export class Game {
 
     // 英雄
     const others = shuffle(HEROES.filter(h => h.id !== heroId).map(h => h.id));
-    const blue = [heroId, ...others.slice(0, 4)], red = others.slice(4);
+    // 英雄池比 10 人多：从其余英雄里随机抽 4 名队友、5 名对手
+    const blue = [heroId, ...others.slice(0, 4)], red = others.slice(4, 9);
     this.bots = [];
     const spawn = (id, team, i) => {
       const f = FOUNTAIN[team], a = i / 5 * Math.PI * 2;
@@ -592,6 +593,9 @@ export class Game {
     this.updateHUD();
     if (this.shop.isOpen) this.shop.render();
     renderInventory(this, $('#hud-items'));
+    this.resT = (this.resT || 0) - dt;
+    if (this.resT <= 0) { this.resT = 0.25; autoBuyReserve(this); }
+    renderReserve(this, $('#hud-reserve'));
     // 悬停在敌人身上时鼠标变成红色攻击手势
     this.curT = (this.curT || 0) - dt;
     if (this.curT <= 0) {

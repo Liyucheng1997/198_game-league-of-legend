@@ -126,12 +126,12 @@ export class Stage {
     this.clearLineup();
     if (this.hero) this.hero.obj.visible = false;
     HEROES.forEach((d, i) => {
-      const row = i < 5 ? 0 : 1, col = i % 5;
-      const u = new Hero(this.world, d, 1, (col - 2) * 2.9 + row * 1.45 - 0.7, row ? -1.6 : 1.6);
+      const row = Math.floor(i / 10), col = i % 10;
+      const u = new Hero(this.world, d, 1, (col - 4.5) * 2.3 + (row % 2) * 1.15 + 1.4, 3.6 - row * 3.4);
       u.facing = 0;
       this.world.add(u);
       this.lineup.push(u);
-      this.world.after(0.15 * i, () => { u.rig.play(['flex', 'raise', 'twirl', 'slash'][i % 4], 0.8); this.world.vfx.puff(u.pos, { n: 10, color: '#ffffff', cell: 'puff', size: 1, y: 0.3 }); });
+      this.world.after(0.06 * i, () => { u.rig.play(['flex', 'raise', 'twirl', 'slash'][i % 4], 0.8); this.world.vfx.puff(u.pos, { n: 10, color: '#ffffff', cell: 'puff', size: 1, y: 0.3 }); });
     });
     this.camMode = 'lineup';
   }
@@ -150,6 +150,8 @@ export class Stage {
     if (sk.id === 'escape' || (h.def.id === 'caitlyn' && key === 'E')) aim = { x: d.pos.x, z: d.pos.z };
     if (h.def.id === 'malphite' && key === 'R') aim = { x: d.pos.x, z: d.pos.z + 1.5 };
     if (h.def.id === 'ahri' && key === 'R') { h.ahriR = null; }
+    if (h.def.id === 'yasuo' && key === 'R') this.world.cc(d, 'knockup', 1); // 狂风绝息斩需要被击飞的目标
+    if (h.def.id === 'leesin' && key === 'Q') h.leeQ = null;
     // 近身范围技能：先走到假人身边再放
     if (sk.aim === 'self' && sk.ai === 'close' && Math.hypot(h.pos.x - d.pos.x, h.pos.z - d.pos.z) > 3) {
       const dx = h.pos.x - d.pos.x, dz = h.pos.z - d.pos.z, l = Math.hypot(dx, dz);
@@ -192,7 +194,7 @@ export class Stage {
     for (const u of this.lineup) { if (!u.rig.action && Math.random() < dt * 0.15) u.rig.play(['flex', 'raise', 'twirl', 'slash', 'throw'][Math.floor(Math.random() * 5)], 0.8); }
     // 镜头
     const lineup = this.camMode === 'lineup';
-    const R = lineup ? 27 : 15.5, ht = lineup ? 7 : 6;
+    const R = lineup ? 33 : 15.5, ht = lineup ? 14 : 6;
     const a = this.angle + (lineup ? 0 : 0.25);
     const cx = Math.sin(a) * R, cz = Math.cos(a) * R;
     this.camera.position.lerp(new THREE.Vector3(cx, ht, cz), Math.min(1, dt * 4));

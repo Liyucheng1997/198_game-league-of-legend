@@ -40,14 +40,15 @@ button { font-family: var(--brush); color: var(--ink); }
 .brand { position: absolute; left: 28px; top: 14px; pointer-events: none !important; }
 .brand h1 { margin: 0; font-family: var(--brush); font-size: 54px; letter-spacing: 4px; transform: rotate(-2deg); color: #fffaf0; -webkit-text-stroke: 2px var(--ink); text-shadow: 4px 4px 0 var(--ink); }
 .brand p { margin: 4px 0 0 6px; font-family: var(--brush); font-size: 17px; background: rgba(246, 236, 214, .85); padding: 2px 10px; border-radius: 10px; display: inline-block; border: 2px solid var(--ink); }
-#roster { position: absolute; left: 24px; top: 128px; display: grid; grid-template-columns: repeat(2, 118px); gap: 12px; }
-.card { position: relative; width: 118px; height: 132px; padding: 6px; background: var(--paper); border: 3px solid var(--ink); border-radius: 12px 16px 10px 14px; box-shadow: 4px 4px 0 var(--ink); display: flex; flex-direction: column; align-items: center; transition: transform .12s; }
+#roster { position: absolute; left: 18px; top: 118px; bottom: 104px; display: grid; grid-template-columns: repeat(5, 76px); grid-auto-rows: 86px; gap: 8px; align-content: start; overflow-y: auto; overflow-x: hidden; padding: 6px 10px 10px 6px; }
+.card { position: relative; width: 76px; height: 86px; padding: 4px; background: var(--paper); border: 3px solid var(--ink); border-radius: 12px 16px 10px 14px; box-shadow: 3px 3px 0 var(--ink); display: flex; flex-direction: column; align-items: center; transition: transform .12s; }
 .card:nth-child(odd) { transform: rotate(-1.5deg); }
 .card:nth-child(even) { transform: rotate(1.2deg); }
 .card:hover { transform: translateY(-3px) rotate(0); }
-.card img { width: 96px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid var(--ink); }
-.card span { font-family: var(--brush); font-size: 19px; font-weight: 900; margin-top: 3px; }
-.card small { font-size: 11px; opacity: .7; }
+.card img { width: 62px; height: 52px; object-fit: cover; border-radius: 8px; border: 2px solid var(--ink); }
+.card span { font-family: var(--brush); font-size: 14px; white-space: nowrap; font-weight: 900; margin-top: 3px; }
+.card small { font-size: 9.5px; opacity: .7; line-height: 1; }
+@media (max-width: 1200px) { #roster { grid-template-columns: repeat(3, 76px); } }
 .card.on { background: var(--c); color: #fffaf0; transform: scale(1.06) rotate(-2deg); }
 .card.on span { -webkit-text-stroke: .6px var(--ink); }
 
@@ -224,6 +225,45 @@ body.in-game #sound-ctl { display: none; }
 .shop-detail .from i { font-style: normal; font-weight: 900; }
 .shop-detail .from small { display: block; color: #3a8a3a; font-weight: 700; }
 .shop-detail .price s { opacity: .5; }
+/* 合成路线、预定 */
+.shop-item.part { opacity: .85; }
+.shop-item.part b::after { content: ' 可买组件'; font-size: 10px; color: #3a8a3a; }
+.shop-item { position: relative; cursor: pointer; user-select: none; }
+.shop-item.reserved::before { content: '📌'; position: absolute; right: 2px; top: 0; font-size: 16px; }
+.shop-detail h4 { margin: 8px 0 4px; font-family: var(--brush); font-size: 15px; clear: both; }
+.recipe small { display: block; color: #3a8a3a; font-weight: 700; font-size: 12px; margin-top: 4px; }
+.tree, .tree ul { list-style: none; margin: 0; padding: 0; display: flex; justify-content: center; }
+.tree ul { padding-top: 12px; position: relative; }
+.tree li { position: relative; padding: 12px 3px 0; display: flex; flex-direction: column; align-items: center; }
+.tree > li { padding-top: 0; }
+.tree ul::before { content: ''; position: absolute; top: 0; left: 50%; height: 12px; border-left: 2px solid var(--ink); }
+.tree ul > li::before { content: ''; position: absolute; top: 0; left: 0; right: 0; border-top: 2px solid var(--ink); }
+.tree ul > li:first-child::before { left: 50%; } .tree ul > li:last-child::before { right: 50%; }
+.tree ul > li:only-child::before { display: none; }
+.tree ul > li::after { content: ''; position: absolute; top: 0; left: 50%; height: 12px; border-left: 2px solid var(--ink); }
+.shop-detail .node { position: relative; display: inline-flex; flex-direction: column; align-items: center; cursor: pointer; user-select: none; }
+.shop-detail .node img { float: none; margin: 0; width: 38px; height: 38px; border-width: 2.5px; border-radius: 9px; }
+.shop-detail .tree > li > .node img { width: 46px; height: 46px; }
+.shop-detail .node b { font: 900 11px var(--body); color: #b8860b; }
+.shop-detail .node.cur img { box-shadow: 0 0 0 3px var(--gold); }
+.shop-detail .node.have img { filter: saturate(.4) brightness(1.1); box-shadow: 0 0 0 3px #5ab05a; }
+.shop-detail .node i { position: absolute; right: -4px; top: -4px; width: 16px; height: 16px; border-radius: 50%; background: #5ab05a; color: #fff; font: 900 11px/16px var(--body); text-align: center; border: 1.5px solid var(--ink); font-style: normal; }
+.shop-detail .node:hover img { transform: translateY(-2px); }
+.into { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.into h4 { width: 100%; }
+.shop-detail .into .node img { width: 34px; height: 34px; }
+.shop-detail .btns { display: flex; gap: 6px; clear: both; }
+.shop-detail .btns .buy { flex: 1; }
+.shop-detail .buy.part { font-size: 15px; background: #bfe6a0; }
+.shop-detail .reserve { margin-top: 8px; padding: 4px 8px; border: 3px solid var(--ink); border-radius: 12px; background: #fff8e8; font-size: 14px; white-space: nowrap; }
+.shop-detail .reserve.on { background: #ffd8c8; }
+.shop-res { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; padding: 2px 8px; border: 2px dashed var(--ink); border-radius: 10px; background: #fff3c0; cursor: pointer; }
+.shop-res img { width: 22px; height: 22px; border-radius: 5px; border: 1.5px solid var(--ink); }
+#hud-reserve { display: flex; align-items: center; gap: 4px; width: 122px; padding: 1px 3px; border: 2px dashed var(--ink); border-radius: 8px; background: #fff3c0; cursor: pointer; font: 700 10px var(--body); }
+#hud-reserve img { width: 20px; height: 20px; border-radius: 4px; border: 1.5px solid var(--ink); }
+#hud-reserve div { flex: 1; height: 6px; border: 1.5px solid var(--ink); border-radius: 4px; background: #fff; overflow: hidden; }
+#hud-reserve div i { display: block; height: 100%; background: var(--gold); }
+#hud-reserve span { white-space: nowrap; }
 
 /* ---------- 属性栏 / 头像下金币 ---------- */
 #hud-stats { grid-column: 1; grid-row: 1 / span 2; display: grid; grid-template-columns: repeat(2, 62px); gap: 3px 8px; padding-right: 10px; border-right: 2px dashed rgba(43, 27, 20, .35); }
