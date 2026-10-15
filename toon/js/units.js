@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { HERO_MODELS, tibbersRig } from './hero-models.js';
 import { HERO_MODELS2 } from './hero-models2.js';
+import { HERO_MODELS3 } from './hero-models3.js';
 import { MAX_RANK, R_LEVELS, xpNeed } from './heroes.js';
 import { ITEM_BY_ID, sumStats, sellPrice } from './items.js';
 import { SPELLS, castSpell, updateTeleport } from './summoners.js';
@@ -76,6 +77,8 @@ export class Unit {
     }
   }
   dist(u) { return Math.hypot(u.pos.x - this.pos.x, u.pos.z - this.pos.z); }
+  // 战争迷雾只对玩家所在的队伍生效（inFog 是按玩家视野算的）
+  hides(u) { return !!u.inFog && this.team === this.world.fogTeam; }
   face(x, z) { if (Math.abs(x - this.pos.x) + Math.abs(z - this.pos.z) > 0.01) this.faceTarget = Math.atan2(x - this.pos.x, z - this.pos.z); }
   turn(dt, rate = 14) {
     if (this.faceTarget === undefined) return;
@@ -137,7 +140,7 @@ export class Unit {
 // ---------------- 英雄 ----------------
 export class Hero extends Unit {
   constructor(world, def, team, x, z) {
-    const rig = (HERO_MODELS[def.id] || HERO_MODELS2[def.id])();
+    const rig = (HERO_MODELS[def.id] || HERO_MODELS2[def.id] || HERO_MODELS3[def.id])();
     super(world, { kind: 'hero', team, x, z, hp: def.hp, radius: def.radius ?? 0.7, speed: def.speed, ad: def.ad, range: def.range, atkSpeed: def.atkSpeed, height: 2.6 * rig.s.scale, name: def.name, obj: rig.root });
     this.def = def;
     this.rig = rig;
@@ -171,6 +174,7 @@ export class Hero extends Unit {
     this.maxHp = Math.round(d.hp + d.hpG * L + (st.hp || 0));
     if (!this.dead) this.hp = Math.max(1, Math.min(this.maxHp, this.hp + Math.max(0, this.maxHp - oldMax)));
     this.ad = d.ad + d.adG * L + (st.ad || 0);
+    this.bonusAd = st.ad || 0;
     if (!this.manaless) {
       const oldMana = this.maxMana;
       this.maxMana = Math.round(d.mana + d.manaG * L + (st.mana || 0));
@@ -179,6 +183,7 @@ export class Hero extends Unit {
     this.armor = (d.tank ? 28 : 20) + 2.4 * L + (st.armor || 0);
     this.mr = 26 + 0.9 * L + (st.mr || 0);
     this.ap = (st.ap || 0) * (uniques.has('rabadon') ? 1.3 : 1);
+    this.range = d.range + (uniques.has('rapidfire') && d.range > 4 ? 1.5 : 0);
     this.itemAs = st.as || 0; this.itemMs = st.ms || 0;
     this.cdr = Math.min(0.4, st.cdr || 0); this.crit = Math.min(1, st.crit || 0);
     this.ls = st.ls || 0; this.hp5 = st.hp5 || 0; this.mp5 = st.mp5 || 0; this.tenacity = st.tenacity || 0;
@@ -231,9 +236,20 @@ export class Hero extends Unit {
     const it = this.items[slot];
     if (!it || this.dead) return 'none';
     const d = ITEM_BY_ID[it.id];
+    const W = this.world;
+    if (d.active === 'zhonya') {
+      this.itemCd = this.itemCd || {};
+      if ((this.itemCd.zhonya || 0) > W.time) return 'cd';
+      this.itemCd.zhonya = W.time + d.activeCd;
+      this.stop(); this.cancelRecall(); this.castLock = 0;
+      this.addBuff('untargetable', 2.5); this.addBuff('stun', 2.5);
+      W.vfx.bubble(this.pos, { color: '#ffd76a', r: 1.4, dur: 2.5, opacity: 0.55, fade: false, follow: this.pos, y: 1.2 });
+      W.vfx.comic(this.pos, '凝滞!', { color: '#ffd76a', size: 2 });
+      W.sfx('shield', this.pos);
+      return 'ok';
+    }
     if (!d.consumable) return 'passive';
     if (this.has('potion')) return 'active';
-    const W = this.world;
     this.addBuff('potion', 10, { every: 0.5, tick: (u) => { u.hp = Math.min(u.maxHp, u.hp + 7.5); } });
     W.vfx.puff(this.pos, { n: 8, color: '#ff8a8a', cell: 'heart', size: 0.4, speed: 1.5, up: 1.5, y: 1.5 });
     W.sfx('heal', this.pos, 0.6);
@@ -241,6 +257,7 @@ export class Hero extends Unit {
     return 'ok';
   }
   addGold(n, show = true) {
+    n *= this.goldMul || 1;
     this.gold += n;
     if (show && n >= 1) {
       this.world.texts.push({ x: this.pos.x + 0.6, y: this.height + 1.1, z: this.pos.z, text: '+' + Math.round(n) + 'g', color: '#ffd23c', t: 0, dur: 1.0 });
@@ -248,10 +265,10 @@ export class Hero extends Unit {
     }
   }
   get skills() { return this.def.skills; }
-  // 技能强度系数：随技能等级与英雄等级成长
+  // 技能强度系数：随技能等级与英雄等级成长，法术强度和装备额外攻击力都会加成
   rk(key) {
     const r = Math.max(1, this.ranks[key] || 0);
-    return (key === 'R' ? 0.8 + 0.45 * r : 0.95 + 0.17 * r) * (1 + 0.025 * (this.level - 1)) * (1 + (this.ap || 0) / 200);
+    return (key === 'R' ? 0.8 + 0.45 * r : 0.95 + 0.17 * r) * (1 + 0.025 * (this.level - 1)) * (1 + (this.ap || 0) / 200 + (this.bonusAd || 0) / 160);
   }
   cdOf(sk) {
     const r = Math.max(1, this.ranks[sk.key]);
@@ -282,7 +299,7 @@ export class Hero extends Unit {
   }
   gainXp(n) {
     if (this.level >= 18) return;
-    this.xp += n;
+    this.xp += n * (this.xpMul || 1);
     while (this.level < 18 && this.xp >= xpNeed(this.level)) { this.xp -= xpNeed(this.level); this.levelUp(); }
     if (this.level >= 18) this.xp = 0;
   }
@@ -329,7 +346,7 @@ export class Hero extends Unit {
   acquire(r) {
     let best = null, bd = 1e9;
     for (const u of this.world.units) {
-      if (u.removed || !u.targetable || u.team === this.team || u.inFog || u.kind === 'dummy') continue;
+      if (u.removed || !u.targetable || u.team === this.team || this.hides(u) || u.kind === 'dummy') continue;
       const d = this.dist(u) - u.radius + (u.isStructure ? 4 : 0);
       if (d <= r && d < bd) { bd = d; best = u; }
     }
@@ -470,6 +487,10 @@ export class Hero extends Unit {
     let regen = 1.2 + 0.1 * this.level + this.hp5 + (this.has('redBuff') ? this.maxHp * 0.01 : 0);
     if (this.uniques.has('warmog') && W.time - (this.lastHit || -99) > 5) regen += this.maxHp * 0.03;
     this.hp = Math.min(this.maxHp, this.hp + regen * dt);
+    if (this.uniques.has('frozen')) {
+      this.frozenT = (this.frozenT || 0) - dt;
+      if (this.frozenT <= 0) { this.frozenT = 0.5; for (const u of W.enemiesIn(this.team, this.pos, 4, { heroOnly: true })) u.addBuff('frozenAs', 0.7, { as: -0.2 }); }
+    }
     if (this.uniques.has('sunfire')) {
       this.burnT = (this.burnT || 0) - dt;
       if (this.burnT <= 0) {
@@ -496,7 +517,7 @@ export class Hero extends Unit {
         else if (!this.path) this.order = null;
       } else if (o && o.type === 'attack') {
         const t = o.target;
-        if (!t || !t.targetable || t.inFog) {
+        if (!t || !t.targetable || this.hides(t)) {
           // 目标没了：攻击移动时继续朝原目标点前进
           if (o.amove) this.orderAttackMove(o.amove.x, o.amove.z); else { this.order = null; this.path = null; }
         }
@@ -577,6 +598,7 @@ export class Hero extends Unit {
     }
     const dealt = W.damage(this, t, dmg, { type: 'phys', auto: true, color: crit ? '#ff5a3a' : undefined });
     if (this.ls > 0 && dealt > 0) this.hp = Math.min(this.maxHp, this.hp + dealt * this.ls);
+    if (this.uniques.has('botrk')) W.damage(this, t, t.kind === 'hero' ? Math.max(15, t.hp * 0.07) : Math.min(60, Math.max(15, t.hp * 0.07)), { type: 'phys', noText: true, item: true });
     if (this.uniques.has('nashor')) W.damage(this, t, 20 + this.ap * 0.15, { type: 'magic', auto: true, noText: true });
     for (const b of [...this.buffs]) if (b.onHit) b.onHit(W, this, t, b);
     if (this.def.onHitSlow) W.cc(t, 'slow', 1, { pct: 0.2, id: 'frost' });

@@ -107,8 +107,8 @@ export function castSpell(h, id, aim, target) {
 }
 function t0(u, h) { return !(u.kind === 'monster' || u.kind === 'minion') || u.team === h.team || !u.targetable || h.dist(u) > SPELLS.smite.range + u.radius; }
 function pickEnemyHero(h, aim, target, range) {
-  if (target && target.kind === 'hero' && target.team !== h.team && target.targetable && !target.inFog && h.dist(target) <= range + 1) return target;
-  return h.world.enemiesIn(h.team, aim, 4, { heroOnly: true }).filter(u => !u.inFog && h.dist(u) <= range + 1)
+  if (target && target.kind === 'hero' && target.team !== h.team && target.targetable && !h.hides(target) && h.dist(target) <= range + 1) return target;
+  return h.world.enemiesIn(h.team, aim, 4, { heroOnly: true }).filter(u => !h.hides(u) && h.dist(u) <= range + 1)
     .sort((a, b) => Math.hypot(a.pos.x - aim.x, a.pos.z - aim.z) - Math.hypot(b.pos.x - aim.x, b.pos.z - aim.z))[0] || null;
 }
 // 传送目标：鼠标附近的友方防御塔或小兵

@@ -99,9 +99,16 @@ export class World {
     let dmg = amt;
     for (const b of u.buffs) if (b.dr) dmg *= 1 - b.dr;
     if (src && src.buffs) for (const b of src.buffs) if (b.weaken) dmg *= 1 - b.weaken;
-    // 护甲与魔抗
-    if (o.type === 'phys' && u.armor) dmg *= 100 / (100 + u.armor);
-    else if (o.type === 'magic' && u.mr) dmg *= 100 / (100 + u.mr);
+    const su = src && src.uniques, uu = u.uniques;
+    const skill = !o.auto && !o.item && src && src !== u;
+    // 护甲与魔抗（多米尼克、黑切穿甲，虚空之杖穿魔抗）
+    if (o.type === 'phys' && u.armor) {
+      let ar = u.armor;
+      if (su && su.has('ldr')) ar *= 0.7;
+      if (u.cleave && u.cleave.until > this.time) ar *= 1 - 0.05 * u.cleave.n;
+      dmg *= 100 / (100 + ar);
+    } else if (o.type === 'magic' && u.mr) dmg *= 100 / (100 + u.mr * (su && su.has('void') ? 0.65 : 1));
+    if (o.auto && uu && uu.has('ninja')) dmg *= 0.88;
     // 护盾
     for (const b of u.buffs) {
       if (b.shield > 0 && dmg > 0) { const a = Math.min(b.shield, dmg); b.shield -= a; dmg -= a; if (b.shield <= 0) b.t = 0; }
@@ -112,9 +119,38 @@ export class World {
     if (src && src.kind === 'hero' && u.kind === 'hero') { src.aggroT = this.time + 2.5; u.lastHeroHit = { src, t: this.time }; }
     u.onDamaged && u.onDamaged(src);
     if (this.isPlayer && src && this.isPlayer(src) && u.team !== src.team) { this.playerTarget = u; this.playerTargetT = this.time; }
-    // 装备特效：荆棘反伤、冰杖减速
-    if (o.auto && src && u.uniques && u.uniques.has('thorns') && src.kind !== 'minion') this.damage(u, src, 20 + u.armor * 0.1, { type: 'magic', noText: true });
-    if (!o.auto && !o.item && src && src.uniques && src.uniques.has('rylai') && src !== u) this.cc(u, 'slow', 1, { pct: 0.3, id: 'rylai' });
+    // 装备特效：荆棘反伤、冰杖减速、黑切破甲、莫雷洛重伤、卢登弹射、血手护盾、守护天使
+    if (o.auto && src && uu && uu.has('thorns') && src.kind !== 'minion') {
+      this.damage(u, src, 20 + u.armor * 0.1, { type: 'magic', noText: true, item: true });
+      if (src.kind === 'hero') src.addBuff('thornsCut', 3, { grievous: 0.4 });
+    }
+    if (skill && su && su.has('rylai')) this.cc(u, 'slow', 1, { pct: 0.3, id: 'rylai' });
+    if (su && su.has('cleaver') && o.type === 'phys' && u.kind === 'hero') {
+      const c = u.cleave && u.cleave.until > this.time ? u.cleave : (u.cleave = { n: 0 });
+      c.n = Math.min(6, c.n + 1); c.until = this.time + 5;
+    }
+    if (skill && su && su.has('morello') && u.kind === 'hero') u.addBuff('morelloCut', 3, { grievous: 0.4 });
+    if (skill && su && su.has('luden') && this.time > (src.ludenT || 0) && u.team !== src.team) {
+      src.ludenT = this.time + 6;
+      const hits = [u, ...this.enemiesIn(src.team, u.pos, 5).filter(v => v !== u).slice(0, 2)];
+      for (const v of hits) {
+        this.damage(src, v, 100 + (src.ap || 0) * 0.1, { type: 'magic', item: true });
+        this.vfx.beam(new THREE.Vector3(u.pos.x, 1.4, u.pos.z), new THREE.Vector3(v.pos.x, 1.4, v.pos.z), { width: 0.3, color: '#7fb7ff', dur: 0.25 });
+        this.vfx.spark(v.pos, '#9fd0ff', 6, 0.7);
+      }
+    }
+    if (uu && uu.has('sterak') && u.hp > 0 && u.hp < u.maxHp * 0.35 && this.time > (u.sterakT || 0)) {
+      u.sterakT = this.time + 60;
+      this.shield(u, u.maxHp * 0.35, 4, '#ffb060');
+      this.vfx.comic(u.pos, '挑战!', { color: '#ffb060', size: 1.8 });
+    }
+    if (u.hp <= 0 && uu && uu.has('ga') && u.kind === 'hero' && this.time > (u.gaT || 0)) {
+      u.gaT = this.time + 180; u.hp = 1; u.path = null;
+      u.addBuff('untargetable', 2); u.addBuff('stun', 2);
+      this.vfx.bubble(u.pos, { color: '#ffe8a0', r: 1.6, dur: 2, opacity: 0.45, fade: false, follow: u.pos, y: 1.2 });
+      this.vfx.comic(u.pos, '守护!', { color: '#ffe8a0', size: 2.2 });
+      this.after(2, () => { if (!u.dead) { u.hp = Math.max(u.hp, u.maxHp * 0.4); this.vfx.pillar(u.pos, { color: '#fff3a0', r: 1.5, h: 10 }); } });
+    }
     if (u.kind !== 'minion' && amt > 8) this.sfx(o.type === 'magic' ? 'zap' : 'hit', u.pos, Math.min(1, 0.35 + amt / 250));
     if (u.rig && dmg > 30) u.rig.hitReact();
     if (!o.noText && amt > 0) {
@@ -268,7 +304,7 @@ export class World {
 
   // ---------- 区域 ----------
   zone(o) {
-    const z = { pos: { x: o.pos.x, z: o.pos.z }, r: o.r, t: 0, dur: o.dur, every: o.every ?? 0.5, acc: 0, team: o.team, onTick: o.onTick, onEnd: o.onEnd, onUpdate: o.onUpdate, dead: false };
+    const z = { pos: { x: o.pos.x, z: o.pos.z }, r: o.r, t: 0, dur: o.dur, every: o.every ?? 0.5, acc: 0, team: o.team, onTick: o.onTick, onEnd: o.onEnd, onUpdate: o.onUpdate, noDodge: o.noDodge, dead: false };
     this.zones.push(z);
     return z;
   }

@@ -10,6 +10,7 @@ import { ITEMS } from './items.js';
 import { initCursors } from './cursor.js';
 import { skillArt, itemArt } from './icons.js';
 import { SPELLS, SPELL_IDS } from './summoners.js';
+import { DIFFICULTY, DIFF_IDS } from './ai.js';
 
 const $ = (s) => document.querySelector(s);
 // 让出一帧给浏览器刷新加载进度；页面在后台时 rAF 不触发，用定时器兜底
@@ -37,7 +38,7 @@ class App {
     const step = async (msg, pct) => { $('#load-msg').textContent = msg; $('#load-bar').style.width = pct + '%'; await frame(); };
 
     await step('正在削铅笔……', 10);
-    await step('正在给三十位英雄画像……', 25);
+    await step('正在给全体英雄画像……', 25);
     this.portraits = renderPortraits(renderer);
     await step('正在手绘技能与装备图标……', 55);
     this.icons = { D: skillArt('D', '#c89a3a') || skillIcon('#e8c25a', '闪'), F: skillArt('F', '#3f8a52') || skillIcon('#5fae6e', '愈') };
@@ -104,6 +105,19 @@ class App {
     this.spells = ['flash', 'heal'];
     try { const s = JSON.parse(localStorage.getItem('toon-spells') || 'null'); if (Array.isArray(s) && s.length === 2 && s.every(x => SPELLS[x])) this.spells = s; } catch (e) { /* 忽略 */ }
     this.renderSpells();
+    // 电脑难度，记在本地
+    this.difficulty = 'normal';
+    try { const d = localStorage.getItem('toon-diff'); if (DIFFICULTY[d]) this.difficulty = d; } catch (e) { /* 忽略 */ }
+    this.renderDiff();
+  }
+  renderDiff() {
+    const box = $('#diff-pick');
+    box.innerHTML = `<b>电脑难度</b>${DIFF_IDS.map(id => `<button data-d="${id}" class="${id === this.difficulty ? 'on' : ''}" title="${DIFFICULTY[id].desc}">${DIFFICULTY[id].name}</button>`).join('')}`;
+    box.querySelectorAll('button').forEach(b => b.onclick = () => {
+      this.difficulty = b.dataset.d;
+      try { localStorage.setItem('toon-diff', this.difficulty); } catch (err) { /* 忽略 */ }
+      this.renderDiff();
+    });
   }
   renderSpells() {
     const box = $('#spell-pick');
@@ -145,7 +159,7 @@ class App {
       <div class="stats">${bar('生命', h.hp, 1100)}${bar('法力', h.mana, 500)}${bar('攻击', h.ad, 80)}${bar('射程', h.range, 12)}${bar('移速', h.speed, 7.5)}<div class="stat"><span>资源</span><em>${h.mana ? '法力 ' + h.mana : '无消耗'}</em></div></div>
       <p class="passive"><b>被动</b>${h.passive}</p>
       <ul class="skills">${h.skills.map(s => `<li data-k="${s.key}"><img src="${this.icons[id + s.key]}"><div><h4><kbd>${s.key}</kbd>${s.name}<small>冷却 ${s.cd}s · ${s.mana ? '法力 ' + s.mana : '无消耗'} · 最高 ${s.key === 'R' ? 3 : 5} 级</small></h4><p>${s.desc}</p></div></li>`).join('')}</ul>
-      <p class="tip">点击技能或按 Q W E R 在展台上预览，按住左键拖动旋转视角。对局中从 1 级开始，击杀小兵/野怪/英雄获得经验，每级 1 个技能点；大招在 6 / 11 / 16 级解锁。</p>`;
+      <p class="tip">点击技能或按 Q W E R 在展台上预览，按住左键拖动旋转视角。对局中从 1 级开始，击杀小兵/野怪/英雄获得经验，每级 1 个技能点；大招在 6 / 11 / 16 级解锁。技能伤害随法术强度和装备提供的额外攻击力提升。</p>`;
     document.querySelectorAll('#info .skills li').forEach(li => li.onclick = () => this.stage.preview(li.dataset.k));
     document.querySelectorAll('#stage-ctrl [data-k]').forEach(b => {
       const s = h.skills.find(x => x.key === b.dataset.k);

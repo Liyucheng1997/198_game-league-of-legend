@@ -52,7 +52,7 @@ button { font-family: var(--brush); color: var(--ink); }
 .card.on { background: var(--c); color: #fffaf0; transform: scale(1.06) rotate(-2deg); }
 .card.on span { -webkit-text-stroke: .6px var(--ink); }
 
-#info { position: absolute; right: 24px; top: 20px; width: 370px; max-height: calc(100vh - 150px); overflow: auto; padding: 16px 18px; }
+#info { position: absolute; right: 24px; top: 20px; width: 370px; max-height: calc(100vh - 250px); overflow: auto; padding: 16px 18px; }
 .info-head { display: flex; gap: 14px; align-items: center; }
 .info-head img { width: 84px; height: 84px; border-radius: 50%; border: 3px solid var(--ink); background: var(--c); }
 .info-head small { font-family: var(--brush); font-size: 16px; opacity: .8; }
@@ -340,3 +340,9 @@ body.dead #paper { opacity: .45; }
 .sp-grid em { display: none; }
 .sp-grid button:hover em { display: block; position: absolute; left: 12px; right: 12px; top: -44px; font-style: normal; font-size: 12px; background: #fffaf0; border: 2px solid var(--ink); border-radius: 8px; padding: 4px 8px; }
 .sp-grid { position: absolute; }
+#diff-pick { position: absolute; right: 24px; bottom: 140px; display: flex; align-items: center; gap: 6px; padding: 6px 10px; }
+#diff-pick > b { font-family: var(--brush); font-size: 16px; margin-right: 2px; }
+#diff-pick button { font: 900 14px var(--body); padding: 5px 11px; border: 2px solid var(--ink); border-radius: 10px; background: #fff8e8; cursor: pointer; }
+#diff-pick button:hover { background: #fff; transform: translateY(-1px); }
+#diff-pick button.on { background: var(--gold); box-shadow: 2px 3px 0 var(--ink); }
+#diff-pick button[data-d="master"].on { background: #ff8a6a; }

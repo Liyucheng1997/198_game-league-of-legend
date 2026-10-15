@@ -4,7 +4,7 @@ import { World } from './world.js';
 import { buildMap, structureLayout, LANES, CAMPS, CRABS, PITS, FOUNTAIN, HALF } from './map.js';
 import { Hero, Minion, Structure, Monster } from './units.js';
 import { HEROES, HERO_BY_ID, xpNeed, MAX_RANK } from './heroes.js';
-import { HeroBot } from './ai.js';
+import { HeroBot, TeamBrain, DIFFICULTY, assignRoles, playerRole } from './ai.js';
 import { Minimap } from './hud.js';
 import { Shop, renderInventory, renderReserve, autoBuyReserve } from './shop.js';
 import { BUILDS, ITEM_BY_ID } from './items.js';
@@ -92,19 +92,30 @@ export class Game {
       return h;
     };
     this.player = spawn(heroId, 1, 0);
-    const blueRoles = shuffle(['top', 'mid', 'bot', 'jungle']);
-    blue.slice(1).forEach((id, i) => this.bots.push(new HeroBot(spawn(id, 1, i + 1), this, blueRoles[i])));
-    const redRoles = shuffle(['top', 'mid', 'bot', 'bot', 'jungle']);
-    red.forEach((id, i) => this.bots.push(new HeroBot(spawn(id, 2, i), this, redRoles[i])));
-    for (const b of this.bots) { b.h.isBot = true; b.h.autoLearn(); }
-    // 召唤师技能：玩家用选人界面选的；电脑打野带惩戒，其余随机
+    // 难度：敌方按所选难度；队友最高到「困难」，且没有资源加成
+    this.diff = DIFFICULTY[app.difficulty] ? app.difficulty : 'normal';
+    const foeP = DIFFICULTY[this.diff], allyP = DIFFICULTY[this.diff === 'master' ? 'hard' : this.diff];
+    this.brains = { 1: new TeamBrain(this, 1, allyP), 2: new TeamBrain(this, 2, foeP) };
+    // 分路：按英雄定位分配上中下野辅；玩家占掉自己英雄最适合的位置
+    const ALL = ['top', 'mid', 'bot', 'support', 'jungle'];
+    const mine = playerRole(HERO_BY_ID[heroId]);
+    const blueRoles = assignRoles(blue.slice(1).map(id => HERO_BY_ID[id]), ALL.filter(r => r !== mine));
+    blue.slice(1).forEach((id, i) => this.bots.push(new HeroBot(spawn(id, 1, i + 1), this, blueRoles[i], this.brains[1], allyP)));
+    const redRoles = assignRoles(red.map(id => HERO_BY_ID[id]), ALL);
+    red.forEach((id, i) => this.bots.push(new HeroBot(spawn(id, 2, i), this, redRoles[i], this.brains[2], foeP)));
+    for (const b of this.bots) {
+      b.h.isBot = true; b.h.autoLearn();
+      if (b.h.team === 2 && foeP.bonus) b.h.goldMul = b.h.xpMul = 1 + foeP.bonus;
+    }
+    // 召唤师技能：玩家用选人界面选的；电脑按分路带（打野惩戒，射手治疗，辅助虚弱/治疗，其他引燃/传送）
     this.player.spells = { D: app.spells[0], F: app.spells[1] };
-    const pool = ['heal', 'ignite', 'barrier', 'teleport', 'exhaust', 'ghost', 'cleanse'];
-    for (const b of this.bots) b.h.spells = { D: 'flash', F: b.role === 'jungle' ? 'smite' : pool[Math.floor(Math.random() * pool.length)] };
+    const SP = { jungle: ['smite'], bot: ['heal', 'barrier', 'heal'], support: ['exhaust', 'ignite', 'heal'], mid: ['ignite', 'teleport', 'barrier', 'cleanse'], top: ['teleport', 'ignite', 'ghost'] };
+    for (const b of this.bots) { const pool = SP[b.role] || ['heal']; b.h.spells = { D: 'flash', F: pool[Math.floor(Math.random() * pool.length)] }; }
     // 音效与金币
     const snd = app.sound;
     W.sfx = (n, p, v) => snd.play(n, p, v);
     W.isPlayer = (u) => u === this.player;
+    W.fogTeam = this.player.team;
     snd.listener = () => this.camTarget;
     snd.startMusic('game');
     for (const u of W.units) if (u.kind === 'hero') u.gold = 500;
@@ -557,8 +568,9 @@ export class Game {
       this.time += dt;
       this.waveT -= dt;
       if (this.waveT <= 0) { this.waveT = 30; this.spawnWave(); }
+      this.brains[1].update(dt); this.brains[2].update(dt);
       for (const b of this.bots) b.update(dt);
-      if (this.time > 20) for (const u of W.units) if (u.kind === 'hero') { if (!u.dead) u.gainXp(2 * dt); u.gold += 2.6 * dt; }
+      if (this.time > 20) for (const u of W.units) if (u.kind === 'hero') { if (!u.dead) u.gainXp(2 * dt); u.gold += 2.6 * dt * (u.goldMul || 1); }
       this.shopT = (this.shopT || 0) - dt;
       if (this.shopT <= 0) { this.shopT = 1; for (const b of this.bots) if (b.h.canShop() && !b.h.isPlayerBot) this.botShop(b.h); }
     }
@@ -755,6 +767,7 @@ export class Game {
   useItem(i) {
     const r = this.player.useItem(i);
     if (r === 'active') this.hint('药水效果还在持续中');
+    else if (r === 'cd') this.hint('装备主动效果冷却中');
     else if (r === 'passive') this.hint('这件装备是被动效果，不需要使用');
   }
   // 推荐出装里下一件要买的东西（整件或其中一个组件）

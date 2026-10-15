@@ -248,7 +248,7 @@ export function renderInventory(g, box) {
     const d = ITEM_BY_ID[it.id];
     const stats = Object.entries(d.stats || {}).map(([k, v]) => fmtStat(k, v)).join('<br>');
     return `<div class="inv" data-i="${i}"><img src="${g.app.itemIcons[it.id]}">${it.count > 1 ? `<b>${it.count}</b>` : ''}<u>${i + 1}</u>
-      <div class="tip"><h4>${d.name}</h4><p>${stats}${d.desc ? '<br>' + d.desc : ''}</p><small>${d.consumable ? `左键或按 ${i + 1} 使用 · ` : ''}右键出售（${sellPrice(d)} 金币，需在泉水）</small></div></div>`;
+      <div class="tip"><h4>${d.name}</h4><p>${stats}${d.desc ? '<br>' + d.desc : ''}</p><small>${d.consumable || d.active ? `左键或按 ${i + 1} 使用 · ` : ''}右键出售（${sellPrice(d)} 金币，需在泉水）</small></div></div>`;
   }).join('');
   box.querySelectorAll('.inv[data-i]').forEach(el => {
     const i = +el.dataset.i;

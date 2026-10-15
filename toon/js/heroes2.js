@@ -214,7 +214,7 @@ export const HEROES2 = [
             wall.children.forEach((m, i) => { m.position.y = 1.4 + Math.sin(e.t * 6 + i) * 0.2; m.material.opacity = 0.45 * (1 - Math.max(0, k - 0.85) / 0.15); });
             if (Math.random() < 0.4) { const q = at(c, n, (Math.random() - 0.5) * 6); W.vfx.trail({ x: q.x, y: Math.random() * 2.5, z: q.z }, { color: '#e6f7ff', glow: true, size: 0.5, vy: 1.5 }); }
           });
-          W.zone({ pos: c, r: 3, dur: 3.5, every: 0.03, team: h.team, onTick: () => {
+          W.zone({ pos: c, r: 3, dur: 3.5, every: 0.03, team: h.team, noDodge: true, onTick: () => {
             for (const p of W.projs) {
               if (p.dead || p.team === h.team) continue;
               if (segDist(p.pos, A1, B1) < 1.0) { p.dead = true; W.vfx.puff(p.pos, { n: 6, color: '#cfe8ff', cell: 'spark', glow: true, size: 0.5, y: 0 }); }
@@ -604,7 +604,7 @@ export const HEROES2 = [
           }
           grp.position.set(c.x, 0, c.z);
           W.vfx.add(grp, 5, (k, dt, e) => { for (const w of walls) { w.m.scale.y = Math.min(1, e.t * 4); w.m.material.opacity = 0.5 * (1 - Math.max(0, k - 0.9) * 10); } });
-          W.zone({ pos: c, r: R, dur: 5, every: 0.1, team: h.team, onTick: () => {
+          W.zone({ pos: c, r: R, dur: 5, every: 0.1, team: h.team, noDodge: true, onTick: () => {
             for (const w of walls) {
               if (!w.alive) continue;
               const hits = lineHits(W, h, w.A, w.B, 0.4);
@@ -1081,7 +1081,7 @@ export const HEROES2 = [
           const ring = new THREE.Mesh(G.torus(R, 0.14, Math.PI * 2, 8, 48), glowMat('#b58aff', 0.7)); ring.rotation.x = Math.PI / 2;
           const grp = new THREE.Group(); grp.add(ring); grp.position.set(pos.x, 0.3, pos.z);
           W.vfx.add(grp, 3.5, (k, dt, e) => { ring.material.opacity = e.t < 0.5 ? 0.25 : 0.7 * (1 - Math.max(0, k - 0.9) * 10); ring.rotation.z += dt; if (e.t > 0.5 && Math.random() < 0.5) { const a = Math.random() * 6.28; W.vfx.trail({ x: pos.x + Math.cos(a) * R, y: 0.3 + Math.random(), z: pos.z + Math.sin(a) * R }, { color: '#c8a0ff', glow: true, size: 0.5, vy: 1.5 }); } });
-          W.zone({ pos, r: R, dur: 3.5, every: 0.05, team: h.team, onTick: (z) => {
+          W.zone({ pos, r: R, dur: 3.5, every: 0.05, team: h.team, noDodge: true, onTick: (z) => {
             if (z.t < 0.5) return;
             for (const u of W.enemiesIn(h.team, pos, R + 0.7)) {
               if (done.has(u) || Math.abs(distXZ(u.pos, pos) - R) > 0.6 + u.radius) continue;

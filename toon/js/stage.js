@@ -121,19 +121,31 @@ export class Stage {
   clearLineup() {
     for (const u of this.lineup) this.world.remove(u);
     this.lineup = [];
+    for (const d of this.dummies) d.obj.visible = true;
   }
   showLineup() {
     this.clearLineup();
     if (this.hero) this.hero.obj.visible = false;
+    for (const d of this.dummies) d.obj.visible = false; // 合影时收起训练假人，免得挡住后排
+    // 每排 9 人，排数随英雄数增加；各排居中、隔排错开半个身位，整体以 z=0 为中心
+    const PER = 9, rows = Math.ceil(HEROES.length / PER);
     HEROES.forEach((d, i) => {
-      const row = Math.floor(i / 10), col = i % 10;
-      const u = new Hero(this.world, d, 1, (col - 4.5) * 2.3 + (row % 2) * 1.15 + 1.4, 3.6 - row * 3.4);
+      const row = Math.floor(i / PER), col = i % PER, inRow = Math.min(PER, HEROES.length - row * PER);
+      const u = new Hero(this.world, d, 1, (col - (inRow - 1) / 2) * 2.3 + (row % 2 - 0.5) * 1.15 + 1.4, ((rows - 1) / 2 - row) * 3.2);
       u.facing = 0;
       this.world.add(u);
       this.lineup.push(u);
       this.world.after(0.06 * i, () => { u.rig.play(['flex', 'raise', 'twirl', 'slash'][i % 4], 0.8); this.world.vfx.puff(u.pos, { n: 10, color: '#ffffff', cell: 'puff', size: 1, y: 0.3 }); });
     });
     this.camMode = 'lineup';
+    this.fitLineup();
+  }
+  // 合影镜头：让整群英雄落在左侧名单与右侧信息面板之间的空当里（窄屏时拉远镜头）
+  fitLineup() {
+    const W = innerWidth, l = document.querySelector('#roster'), r = document.querySelector('#info');
+    const left = l && l.offsetParent ? l.getBoundingClientRect().right : 0, right = r && r.offsetParent ? r.getBoundingClientRect().left : W;
+    const gap = Math.max(W * 0.3, right - left);
+    this.lineFit = { shift: right > left ? (left + right) / 2 - W / 2 : 0, k: Math.min(1.9, Math.max(1, W * 0.6 / gap)) };
   }
   preview(key, forced) {
     const h = this.hero;
@@ -194,14 +206,18 @@ export class Stage {
     for (const u of this.lineup) { if (!u.rig.action && Math.random() < dt * 0.15) u.rig.play(['flex', 'raise', 'twirl', 'slash', 'throw'][Math.floor(Math.random() * 5)], 0.8); }
     // 镜头
     const lineup = this.camMode === 'lineup';
-    const R = lineup ? 33 : 15.5, ht = lineup ? 14 : 6;
+    const fit = (lineup && this.lineFit) || { shift: 0, k: 1 };
+    const R = lineup ? 33 * fit.k : 15.5, ht = lineup ? 22 * fit.k : 6;
     const a = this.angle + (lineup ? 0 : 0.25);
     const cx = Math.sin(a) * R, cz = Math.cos(a) * R;
     this.camera.position.lerp(new THREE.Vector3(cx, ht, cz), Math.min(1, dt * 4));
     if (lineup) this.camera.lookAt(1.4, 1.2, 0);
     else this.camera.lookAt(1.5, 1.2, -1.8);
+    // 合影时把画面中心平移到两侧面板之间
+    if (lineup && fit.shift) this.camera.setViewOffset(innerWidth, innerHeight, -fit.shift, 0, innerWidth, innerHeight);
+    else if (this.camera.view && this.camera.view.enabled) this.camera.clearViewOffset();
   }
-  resize() { this.camera.aspect = innerWidth / innerHeight; this.camera.updateProjectionMatrix(); }
+  resize() { this.camera.aspect = innerWidth / innerHeight; this.camera.updateProjectionMatrix(); if (this.camMode === 'lineup') this.fitLineup(); }
   render(renderer) {
     renderer.render(this.scene, this.camera);
     this.app.overlay.draw(this.world, this.camera, this.hero, true);

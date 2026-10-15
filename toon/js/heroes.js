@@ -5,6 +5,7 @@ import { projMesh } from './vfx.js';
 import { Pet } from './units.js';
 import { dirOf, at, rot, inCone, lineHits, notMinion, dropFromSky, L, C, A, SELF, T, NONE } from './skill-kit.js';
 import { HEROES2 } from './heroes2.js';
+import { HEROES3 } from './heroes3.js';
 
 const tip = (h) => h.tipPos();
 
@@ -672,6 +673,7 @@ const IND = {
   malphite: [T(), NONE, SELF(4.2), A(3.8)], soraka: [A(2.6), T(), A(3.5), NONE],
 };
 HEROES.push(...HEROES2);
+HEROES.push(...HEROES3);
 for (const h of HEROES) {
   const sfx = h.sfx || SKILL_SFX[h.id], ind = h.ind || IND[h.id];
   h.skills.forEach((s, i) => { s.sfx = sfx[i]; s.ind = ind[i]; });
